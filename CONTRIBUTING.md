@@ -50,8 +50,8 @@ checksum steps of its neighbours so that it reads and runs alone.
 ## Your first change and where to ask
 
 [Your first change](README.md#your-first-change) lists four steps, from a docs fix to matching one
-function. Ask questions in [GitHub Discussions](https://github.com/raulcorreia7/bof3/discussions)
-once enabled. Report a security or conduct problem privately ([SECURITY.md](SECURITY.md)).
+function. Ask questions in [GitHub Discussions](https://github.com/raulcorreia7/bof3/discussions).
+Report a security or conduct problem privately ([SECURITY.md](SECURITY.md)).
 
 ## License
 
