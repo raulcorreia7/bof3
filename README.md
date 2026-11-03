@@ -34,7 +34,7 @@ Start with the smallest step that fits what you have:
 2. Improve a [wiki](https://raulcorreia7.github.io/bof3-wiki/) page.
 3. Add a Rust test to the [tools](https://github.com/raulcorreia7/bof3-tools) or the
    [player](https://github.com/raulcorreia7/bof3-player) (`make check-tools`, `make check-player`).
-4. With a disc, match one function in bof3-decomp (`tools/match.sh`, then `check-<image>`).
+4. With a disc, match one function in bof3-decomp (`decomp/tools/match.sh`, then `check-<image>`).
 
 Each member's contributor guide has the details:
 [decomp](https://github.com/raulcorreia7/bof3-decomp/blob/main/CONTRIBUTING.md),
