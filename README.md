@@ -1,64 +1,40 @@
-# BOF3 workspace
+# bof3
 
-A matching decompilation of *Breath of Fire III* (US, PlayStation), with Rust tools for
-disc images, archives, assets and audio. The projects are independent Git submodules;
-the [wiki](https://raulcorreia7.github.io/bof3-wiki/) holds the shared game and format documentation.
+[![CI](https://github.com/raulcorreia7/bof3/actions/workflows/docs.yml/badge.svg?branch=main)](https://github.com/raulcorreia7/bof3/actions/workflows/docs.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-No game data is included. Dump your own US disc (Redump-verified CUE and BIN).
-This is a fan project, not affiliated with or endorsed by Capcom.
+The workspace of the *Breath of Fire III* (US, PlayStation) projects: a matching decompilation, Rust
+tools for discs, archives and assets, an audio player, a progress site and a specification wiki. Each
+project is its own repository, pinned here as a Git submodule. This repository holds the shared
+`make` entry point and the pins.
 
-## Names
+**No game data is included.** Dump your own US disc (Redump-verified CUE sheet and BIN tracks). This
+is a fan project, not affiliated with or endorsed by Capcom. *Breath of Fire* is Capcom's trademark.
 
-The repository names and the folders in this workspace differ. This table maps them.
+## Projects
 
-| Repository                                                 | Folder                     | What it is                                             |
-| ---------------------------------------------------------- | -------------------------- | ------------------------------------------------------ |
-| [bof3](https://github.com/raulcorreia7/bof3)               | `.`                        | Shared build entry points and the pins of the members. |
-| [bof3-decomp](https://github.com/raulcorreia7/bof3-decomp) | `decomp/`                  | Readable C89 that builds to the retail bytes (CC0).    |
-| [bof3-tools](https://github.com/raulcorreia7/bof3-tools)   | `decomp/tools/bof3-tools/` | Disc, EMI archive and asset tools; the `bof3` CLI.     |
-| [bof3-player](https://github.com/raulcorreia7/bof3-player) | `player/`                  | Play, browse and export the game's music and sound.    |
-| [bof3-status](https://github.com/raulcorreia7/bof3-status) | `status/`                  | Decompilation progress from the generated report.      |
-| [bof3-wiki](https://raulcorreia7.github.io/bof3-wiki/)     | `wiki/`                    | Shared game and file-format facts.                     |
+| Project                                                    | Folder                     | What it is                                             | Status                                                                                                                                                       |
+| ---------------------------------------------------------- | -------------------------- | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| [bof3-decomp](https://github.com/raulcorreia7/bof3-decomp) | `decomp/`                  | Readable C89 that builds to the retail bytes (CC0).    | [![CI](https://github.com/raulcorreia7/bof3-decomp/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/raulcorreia7/bof3-decomp/actions)     |
+| [bof3-tools](https://github.com/raulcorreia7/bof3-tools)   | `decomp/tools/bof3-tools/` | Disc, EMI archive and asset tools; the `bof3` command. | [![CI](https://github.com/raulcorreia7/bof3-tools/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/raulcorreia7/bof3-tools/actions)       |
+| [bof3-player](https://github.com/raulcorreia7/bof3-player) | `player/`                  | Play, browse and export the game's music and sound.    | [![CI](https://github.com/raulcorreia7/bof3-player/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/raulcorreia7/bof3-player/actions)     |
+| [bof3-status](https://github.com/raulcorreia7/bof3-status) | `status/`                  | Decompilation progress from the generated report.      | [![CI](https://github.com/raulcorreia7/bof3-status/actions/workflows/deploy.yml/badge.svg?branch=main)](https://github.com/raulcorreia7/bof3-status/actions) |
+| [bof3-wiki](https://raulcorreia7.github.io/bof3-wiki/)     | `wiki/`                    | Shared game and file-format facts.                     | [![Pages](https://github.com/raulcorreia7/bof3-wiki/actions/workflows/pages.yml/badge.svg?branch=main)](https://github.com/raulcorreia7/bof3-wiki/actions)   |
 
-The tools build the `bof3` command. `make build-tools` installs it as `bin/bof3`; a plain
-`cargo build --release` in the tools repository writes the same binary to `target/release/bof3`.
+The tools build the `bof3` command. `make build-tools` installs it as `bin/bof3`.
 
-Rust: the tools and this workspace need 1.99 or later (`rust-toolchain.toml` pins 1.99.1); bof3-player
-needs 1.88 or later.
-
-## Your first change
-
-Start with the smallest step that fits what you have:
-
-1. Fix a docs page, here or in a member. `make check` verifies it.
-2. Improve a [wiki](https://raulcorreia7.github.io/bof3-wiki/) page.
-3. Add a Rust test to the [tools](https://github.com/raulcorreia7/bof3-tools) or the
-   [player](https://github.com/raulcorreia7/bof3-player) (`make check-tools`, `make check-player`).
-4. With a disc, match one function in bof3-decomp (`decomp/tools/match.sh`, then `check-<image>`).
-
-Each member's contributor guide has the details:
-[decomp](https://github.com/raulcorreia7/bof3-decomp/blob/main/CONTRIBUTING.md),
-[tools](https://github.com/raulcorreia7/bof3-tools/blob/main/CONTRIBUTING.md),
-[player](https://github.com/raulcorreia7/bof3-player/blob/main/CONTRIBUTING.md),
-[status](https://github.com/raulcorreia7/bof3-status/blob/main/CONTRIBUTING.md),
-[wiki](https://github.com/raulcorreia7/bof3-wiki/blob/main/CONTRIBUTING.md).
-
-## Where to ask
-
-Ask questions and share ideas in
-[GitHub Discussions](https://github.com/raulcorreia7/bof3/discussions) once enabled. Report
-bugs as issues in the repository that owns the code. Report a security or conduct problem privately
-([SECURITY.md](SECURITY.md)).
-
-## Get started
+## Quick start
 
 ```sh
-git clone https://github.com/raulcorreia7/bof3.git
+git clone --recurse-submodules https://github.com/raulcorreia7/bof3.git
 cd bof3
 make help
 ```
 
-Submodules are cloned the first time a target needs them. Pick what you want to change:
+Without `--recurse-submodules`, `make` clones the submodule a target needs the first time you run
+it. To work in a member without `make`, run `git submodule update --init -- PATH`.
+
+Pick what you want to change:
 
 | Contribution                  | Needs a disc | Run                                           | Owner                                                                           |
 | ----------------------------- | ------------ | --------------------------------------------- | ------------------------------------------------------------------------------- |
@@ -83,9 +59,7 @@ Without a disc, `make setup SETUP_ARGS="--dev --no-payloads"` installs the toolc
 `meson compile -C decomp/build/meson check-tree include-asm` runs the checks that need no game data.
 The tools, player, site and wiki build and check without game data.
 
-`make status` shows submodule revisions. `make sync` moves all members and nested tools to their
-pins, which can move clean submodule checkouts; setup and builds never do. `make build-all` builds
-every project, and each project has its own target:
+`make build-all` builds every project, and each project has its own target:
 
 ```sh
 make build             # game images (Meson)
@@ -97,9 +71,8 @@ make wiki              # shared documentation
 ```
 
 For the player alone, use the [bof3-player releases](https://github.com/raulcorreia7/bof3-player/releases)
-or its [build instructions](https://github.com/raulcorreia7/bof3-player/blob/main/README.md#build-from-source). Each project's README lists its
-prerequisites. To work inside a member without `make`, initialize it with
-`git submodule update --init -- PATH`.
+or its [install instructions](https://github.com/raulcorreia7/bof3-player/blob/main/README.md#install). Each project's README lists its
+prerequisites.
 
 ## Build ownership
 
@@ -146,7 +119,52 @@ build and `make check` need the `docs` set: `bash tools/install/host.sh docs`.
 Pull requests and manual CI runs run `make check`: the shared Markdown check and the wiki build.
 Each member repository owns its CI; full game byte checks use the maintainer's disc.
 
-Contributing: [CONTRIBUTING.md](CONTRIBUTING.md).
-Agent guidance: [AGENTS.md](AGENTS.md).
-First-party code is MIT licensed except for bof3-decomp, which uses CC0 1.0.
-Each project and third-party dependency keeps its own license and notices.
+## Update the submodules
+
+`make status` shows every submodule revision. `make sync` moves all members and the nested tools to
+the pins recorded here; it can move clean submodule checkouts, and setup and builds never do.
+
+To take a member's newest `main` and record it as the new pin:
+
+```sh
+git submodule update --remote --merge -- player   # or decomp, status, wiki
+git add player
+git commit -m "chore(submodules): update player"
+```
+
+Change a pin only after the member's commit is on its `main`. The pin of the tools lives in
+bof3-decomp (`decomp/tools/bof3-tools`).
+
+## Your first change
+
+Start with the smallest step that fits what you have:
+
+1. Fix a docs page, here or in a member. `make check` verifies it.
+2. Improve a [wiki](https://raulcorreia7.github.io/bof3-wiki/) page.
+3. Add a Rust test to the [tools](https://github.com/raulcorreia7/bof3-tools) or the
+   [player](https://github.com/raulcorreia7/bof3-player) (`make check-tools`, `make check-player`).
+4. With a disc, match one function in bof3-decomp (`decomp/tools/match.sh`, then `check-<image>`).
+
+Each member's contributor guide has the details:
+[decomp](https://github.com/raulcorreia7/bof3-decomp/blob/main/CONTRIBUTING.md),
+[tools](https://github.com/raulcorreia7/bof3-tools/blob/main/CONTRIBUTING.md),
+[player](https://github.com/raulcorreia7/bof3-player/blob/main/CONTRIBUTING.md),
+[status](https://github.com/raulcorreia7/bof3-status/blob/main/CONTRIBUTING.md),
+[wiki](https://github.com/raulcorreia7/bof3-wiki/blob/main/CONTRIBUTING.md).
+
+## Where to ask
+
+Ask questions and share ideas in
+[GitHub Discussions](https://github.com/raulcorreia7/bof3/discussions). Report
+bugs as issues in the repository that owns the code. Report a security or conduct problem privately
+([SECURITY.md](SECURITY.md)).
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md), the [code of conduct](CODE_OF_CONDUCT.md) and the
+[security policy](SECURITY.md). Agent guidance is in [AGENTS.md](AGENTS.md).
+
+## License
+
+MIT, except bof3-decomp, which uses CC0 1.0. See [LICENSE](LICENSE) and [NOTICE](NOTICE). Each project
+and third-party dependency keeps its own license and notices.
