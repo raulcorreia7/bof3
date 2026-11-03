@@ -1,0 +1,8 @@
+The MIT license in LICENSE covers first-party workspace code and documentation.
+It does not cover the game or third-party material.
+
+Breath of Fire III belongs to Capcom. No game data is included; users supply their
+own disc. The bof3-decomp submodule uses CC0 1.0 and carries its own NOTICE.
+
+Third-party submodules keep their own licenses and terms. Hardware documents and
+analysis databases are cited through links; copies are not distributed here.

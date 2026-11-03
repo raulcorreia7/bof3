@@ -1,0 +1,12 @@
+[submodule "player"]
+	path = player
+	url = https://github.com/raulcorreia7/bof3-player.git
+[submodule "decomp"]
+	path = decomp
+	url = https://github.com/raulcorreia7/bof3-decomp.git
+[submodule "status"]
+	path = status
+	url = https://github.com/raulcorreia7/bof3-status.git
+[submodule "wiki"]
+	path = wiki
+	url = https://github.com/raulcorreia7/bof3-wiki.git
