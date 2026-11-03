@@ -38,7 +38,7 @@ help:
 	@echo "  setup     Initialize decomp, run its setup (needs your disc) and configure Meson."
 	@echo "  build     Build decomp's 428 game images with Meson; checks run separately."
 	@echo "  build-all Build game, tools, both player interfaces and status."
-	@echo "  build-tools Build disc/archive tools; is an alias."
+	@echo "  build-tools Build disc/archive tools."
 	@echo "  build-player Build the CLI and terminal player."
 	@echo "  build-player-gui Build the graphical player."
 	@echo "  build-status Build the status site (Node/npm)."
