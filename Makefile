@@ -26,7 +26,7 @@ JOBS ?= $(patsubst -j%,%,$(filter -j%,$(MAKEFLAGS)))
 endif
 JOBS := $(or $(JOBS),$(DEFAULT_JOBS))
 
-.PHONY: help status sync init-game init-tools init-player init-status init-wiki setup build build-all build-rust build-tools build-player build-player-gui build-status test format lint wiki check check-all check-game check-tools check-player check-status clean distclean
+.PHONY: help status sync init-game init-tools init-player init-status init-wiki setup build build-all build-tools build-player build-player-gui build-status test format lint wiki check check-all check-game check-tools check-player check-status clean distclean
 
 help:
 	@echo "BOF3 monorepo front door: $(CURDIR)"
@@ -38,7 +38,7 @@ help:
 	@echo "  setup     Initialize decomp, run its setup (needs your disc) and configure Meson."
 	@echo "  build     Build decomp's 428 game images with Meson; checks run separately."
 	@echo "  build-all Build game, tools, both player interfaces and status."
-	@echo "  build-tools Build disc/archive tools; build-rust is an alias."
+	@echo "  build-tools Build disc/archive tools; is an alias."
 	@echo "  build-player Build the CLI and terminal player."
 	@echo "  build-player-gui Build the graphical player."
 	@echo "  build-status Build the status site (Node/npm)."
@@ -95,9 +95,6 @@ build: $(GAME_BUILD)/build.ninja
 
 build-all:
 	$(MAKE) $(if $(filter -j%,$(MAKEFLAGS)),,-j$(JOBS)) JOBS=$(JOBS) build-tools build-player build-player-gui build build-status
-
-# Compatibility alias; player builds have their own targets.
-build-rust: build-tools
 
 build-tools: init-tools
 	$(MAKE) -C $(TOOLS) build CARGO_TARGET_DIR="$(CURDIR)/$(BUILD_DIR)/rust"
