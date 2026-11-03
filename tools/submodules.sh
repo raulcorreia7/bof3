@@ -39,8 +39,8 @@ case "${1:-}" in
         ;;
     sync)
         [ "$#" -eq 1 ] || usage
-        git submodule sync -- decomp player status
-        git submodule update --init -- decomp player status
+        git submodule sync -- decomp player status wiki
+        git submodule update --init -- decomp player status wiki
         git -C decomp submodule sync -- tools/bof3-tools
         git -C decomp submodule update --init -- tools/bof3-tools
         ;;
