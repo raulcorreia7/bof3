@@ -1,0 +1,36 @@
+name: Documentation and workspace smoke
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: docs-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - name: Check scripts and a fresh workspace
+        run: |
+          for script in tools/submodules.sh tools/stage.sh tools/clean.sh; do
+            sh -n "$script"
+          done
+          make help
+          make status
+          make clean
+          test ! -e meson.build
+      - name: Install documentation tools
+        run: |
+          bash tools/install/dprint.sh
+          bash tools/install/mdbook.sh
+          bash tools/install/mdbook-mermaid.sh
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+      - name: Check shared documentation through Make
+        run: make check

@@ -1,0 +1,41 @@
+# Build artifacts
+build/
+dist/
+/bin/bof3
+/bin/bof3player
+/bin/bof3player-tui
+/bin/bof3player-gui
+
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+
+# IDA/Ghidra databases
+*.i64
+
+# Local tool state
+/.commandcode/
+
+# Local notes and history; never tracked, never removed by make clean
+/.local/
+
+# Local agent state and worktrees
+/.skill-state/
+/.worktrees/
+
+# Game media: a contributor's disc never gets staged
+*.bin
+*.cue
+*.iso
+*.img
+*.wav
+*.flac
+*.ogg
