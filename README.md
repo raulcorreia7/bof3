@@ -113,8 +113,8 @@ Keep `$HOME/.local/bin` on `PATH` in your shell profile. On other platforms, ins
 dprint release asset. `dprint.json` pins the formatter plugins. Rust uses rustfmt, C/C++ uses
 clang-format and Python uses Ruff.
 
-`bash tools/install/host.sh format|game|docs|analysis` installs the other pinned tools. The wiki
-build and `make check` need the `docs` set: `bash tools/install/host.sh docs`.
+`bash tools/install/host.sh format|game|analysis` installs the other pinned tools. The wiki build
+and `make check` need Node.js 22.23.4 or later.
 
 Pull requests and manual CI runs run `make check`: the shared Markdown check and the wiki build.
 Each member repository owns its CI; full game byte checks use the maintainer's disc.
