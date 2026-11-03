@@ -45,7 +45,7 @@ help:
 	@echo "  test      Run disc/archive tool tests."
 	@echo "  format    Format shared docs/config with system dprint; CHECK=1 checks."
 	@echo "  lint      Lint disc/archive tools."
-	@echo "  wiki      Build the wiki into build/wiki."
+	@echo "  wiki      Build the wiki into wiki/dist (Node/npm)."
 	@echo "  check     Check shared docs/config and build the wiki."
 	@echo "  check-game/check-tools/check-player/check-status Check one project."
 	@echo "  check-all Check shared docs and every project."
@@ -122,12 +122,10 @@ format:
 lint: init-tools
 	$(MAKE) -C $(TOOLS) lint CARGO_TARGET_DIR="$(CURDIR)/$(BUILD_DIR)/rust"
 
-# Build the wiki submodule into build/wiki (gitignored). mdBook fails on a page missing from SUMMARY.
-# tools/install/ pins mdBook and mdbook-mermaid; mdbook-mermaid install writes its assets into wiki/ (ignored there).
+# Build the wiki submodule (Astro Starlight) into wiki/dist, which the wiki ignores.
+# Needs Node.js 22.23.4 or later.
 wiki: init-wiki
-	@command -v mdbook >/dev/null 2>&1 && command -v mdbook-mermaid >/dev/null 2>&1 || { echo "make: mdbook or mdbook-mermaid is not installed. Run: bash tools/install/host.sh docs (then put ~/.local/bin on PATH)" >&2; exit 1; }
-	mdbook-mermaid install wiki
-	mdbook build wiki -d build/wiki
+	cd wiki && npm ci && npm run check && npm run build
 
 # Shared checks do not require the game, Rust, or Node toolchains.
 check:

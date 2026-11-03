@@ -14,7 +14,7 @@ init() {
         game)   path=decomp; marker=meson.build ;;
         player) path=player; marker=Cargo.toml ;;
         status) path=status; marker=Makefile ;;
-        wiki)   path=wiki; marker=book.toml ;;
+        wiki)   path=wiki; marker=package.json ;;
         tools)
             init game
             git -C decomp submodule sync -- tools/bof3-tools

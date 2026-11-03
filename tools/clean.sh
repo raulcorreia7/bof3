@@ -14,7 +14,7 @@ esac
 if [ -f decomp/build/meson/build.ninja ]; then meson compile -C decomp/build/meson --clean; fi
 rm -rf decomp/work decomp/build/report.json
 if [ -f status/Makefile ]; then make -C status clean; fi
-rm -rf build/extract build/wiki build/rust/tmp
+rm -rf build/extract build/rust/tmp
 
 # Prune workspace-owned Python caches, not member repositories.
 find . \( -path './.git' -o -path './.venv' -o -path './build' \

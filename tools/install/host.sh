@@ -12,7 +12,6 @@ Usage: bash tools/install/host.sh [OPTIONS] <selection>...
 Install host tools by workflow group. Selections (repeatable):
   format     dprint
   game       uv
-  docs       mdbook, mdbook-mermaid
   analysis   coddog, objdiff-cli, rizin
 
 Options:
@@ -30,7 +29,7 @@ for arg in "$@"; do
   case "$arg" in
     --force) FORCE_ARGS=(--force) ;;
     -h|--help) usage; exit 0 ;;
-    format|game|docs|analysis) SELECTIONS+=("$arg") ;;
+    format|game|analysis) SELECTIONS+=("$arg") ;;
     *) usage >&2; exit 1 ;;
   esac
 done
@@ -47,10 +46,6 @@ for selection in "${SELECTIONS[@]}"; do
       ;;
     game)
       bash "$DIR/uv.sh" "${FORCE_ARGS[@]}"
-      ;;
-    docs)
-      bash "$DIR/mdbook.sh" "${FORCE_ARGS[@]}"
-      bash "$DIR/mdbook-mermaid.sh" "${FORCE_ARGS[@]}"
       ;;
     analysis)
       bash "$DIR/coddog.sh" "${FORCE_ARGS[@]}"
