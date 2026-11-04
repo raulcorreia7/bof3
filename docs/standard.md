@@ -22,3 +22,14 @@ Third-party submodules keep their owners' terms and are not changed.
 | Prose         | READMEs, docs, comments and help text are plain and current: no history, no hedging, no filler.                                                                                                                                                     |
 | Commits       | Conventional subjects; no AI attribution or session trailers.                                                                                                                                                                                       |
 | Going public  | History holds nothing the tree may not (filtered or fresh first commit); the owner creates the repository and pushes; the workspace then consumes it as a submodule.                                                                                |
+
+## Comments
+
+Comments say what, never how. They are minimal and high signal: one line, only where a name or a
+type cannot carry the meaning. This holds for C, Rust, TypeScript, shell and YAML. A comment never
+retells the code, its history, the evidence or the tools. Evidence for a name goes in the commit
+body, and in `config/symbols.toml` `source` for decomp names.
+
+Standing exceptions: legal text, tool directives and `@bug`. The decomp exceptions (`FAKE:` notes
+and the `INCLUDE_ASM` line) are in the
+[decomp conventions](https://github.com/raulcorreia7/bof3-decomp/blob/main/docs/conventions.md#comments).
