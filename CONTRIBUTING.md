@@ -1,16 +1,16 @@
 # Contributing
 
 All contributions follow the [code of conduct](CODE_OF_CONDUCT.md). Choose the repository that owns
-the change. The monorepo owns shared build entrypoints. The wiki lives in the public
-[bof3-wiki](https://github.com/raulcorreia7/bof3-wiki) repository, pinned at `wiki/`; each submodule owns its source,
-documentation and validation.
+the change. This workspace owns the shared build entry points. Each member repository is pinned
+here as a submodule and owns its source, documentation and validation; the wiki is
+[bof3-wiki](https://github.com/raulcorreia7/bof3-wiki), pinned at `wiki/`.
 
 | Change                                         | Start here                                                                                             |
 | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
 | Game code, matching or decompilation setup     | [bof3-decomp contributor guide](https://github.com/raulcorreia7/bof3-decomp/blob/main/CONTRIBUTING.md) |
 | Music, sound or player interfaces              | [bof3-player contributor guide](https://github.com/raulcorreia7/bof3-player/blob/main/CONTRIBUTING.md) |
 | Disc, archive or asset tools                   | [bof3-tools README](https://github.com/raulcorreia7/bof3-tools/blob/main/README.md)                    |
-| Progress site                                  | [status README](https://github.com/raulcorreia7/bof3-status/blob/main/README.md)                       |
+| Progress site                                  | [bof3-status README](https://github.com/raulcorreia7/bof3-status/blob/main/README.md)                  |
 | Shared builds or game and format documentation | [workspace README](README.md), [wiki](https://raulcorreia7.github.io/bof3-wiki/)                       |
 | Project maintenance standards                  | [project standard](docs/standard.md)                                                                   |
 

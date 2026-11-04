@@ -21,7 +21,7 @@ is a fan project, not affiliated with or endorsed by Capcom. *Breath of Fire* is
 | [bof3-status](https://github.com/raulcorreia7/bof3-status) | `status/`                  | Decompilation progress from the generated report.      | [![CI](https://github.com/raulcorreia7/bof3-status/actions/workflows/deploy.yml/badge.svg?branch=main)](https://github.com/raulcorreia7/bof3-status/actions) |
 | [bof3-wiki](https://raulcorreia7.github.io/bof3-wiki/)     | `wiki/`                    | Shared game and file-format facts.                     | [![Pages](https://github.com/raulcorreia7/bof3-wiki/actions/workflows/pages.yml/badge.svg?branch=main)](https://github.com/raulcorreia7/bof3-wiki/actions)   |
 
-The tools build the `bof3` command. `make build-tools` installs it as `bin/bof3`.
+`make build-tools` builds the `bof3` command and installs it as `bin/bof3`.
 
 ## Quick start
 
@@ -47,12 +47,13 @@ Pick what you want to change:
 Host tools: `git`, `curl`, `7z`, a C compiler, Meson 1.3 or later with Ninja, `uv`
 (`bash tools/install/host.sh game`) and Rust 1.99 or later. `check-tools` and `check-player` also
 need `cargo install cargo-deny --locked`; the status site needs Node.js 22 or later. The full list,
-with install commands, is in the [toolchain guide](https://github.com/raulcorreia7/bof3-decomp/blob/main/docs/toolchain.md#host-tools).
+with install commands, is in the
+[toolchain guide](https://github.com/raulcorreia7/bof3-decomp/blob/main/docs/toolchain.md#host-tools).
 
 A game build needs your own complete US disc image: the Redump CUE sheet and its two BIN tracks.
 Run `make init-game` to clone bof3-decomp and put the disc files in `decomp/inputs/external/` (see
-[decomp/inputs](https://github.com/raulcorreia7/bof3-decomp/blob/main/inputs/README.md)). Then run `make setup`: it installs the pinned toolchain,
-extracts the disc and configures Meson. `make check-game` then confirms that all 428 images match
+[decomp/inputs](https://github.com/raulcorreia7/bof3-decomp/blob/main/inputs/README.md)). Then run
+`make setup`: it installs the pinned toolchain, extracts the disc and configures Meson. `make check-game` then confirms that all 428 images match
 the retail bytes.
 
 Without a disc, `make setup SETUP_ARGS="--dev --no-payloads"` installs the toolchain, and
@@ -71,14 +72,14 @@ make wiki              # shared documentation
 ```
 
 For the player alone, use the [bof3-player releases](https://github.com/raulcorreia7/bof3-player/releases)
-or its [install instructions](https://github.com/raulcorreia7/bof3-player/blob/main/README.md#install). Each project's README lists its
-prerequisites.
+or its [install instructions](https://github.com/raulcorreia7/bof3-player/blob/main/README.md#install).
+Each project's README lists its prerequisites.
 
 ## Build ownership
 
-The root `Makefile` forwards to the members; it owns no compiler or build graph. The game
-repository owns its [Meson build](https://github.com/raulcorreia7/bof3-decomp/blob/main/docs/toolchain.md#how-the-build-works) and
-`decomp/tools/setup.sh`, the Rust workspaces own their Cargo manifests, and the status site owns its
+The root `Makefile` forwards to the members; it owns no compiler or build graph. bof3-decomp owns
+its [Meson build](https://github.com/raulcorreia7/bof3-decomp/blob/main/docs/toolchain.md#how-the-build-works)
+and `decomp/tools/setup.sh`, the Rust workspaces own their Cargo manifests, and the status site owns its
 npm scripts. Root scripts: `tools/submodules.sh`, `tools/stage.sh` and `tools/clean.sh`.
 
 `make clean` removes build output and keeps the extracted disc. `make distclean` also removes the

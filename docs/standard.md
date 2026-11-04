@@ -1,9 +1,9 @@
 # Project standard
 
-Every repository this project owns meets the same bar: `bof3`, `bof3-decomp` (`decomp`),
-`bof3-status` (`status`), `bof3-tools` (`decomp/tools/bof3-tools`), `bof3-player` (`player`) and `bof3-wiki` (`wiki`),
-each a submodule of its public repository. Third-party
-submodules keep their owners' terms and are not changed.
+Every repository this project owns meets the same bar: `bof3` (this workspace), `bof3-decomp`
+(`decomp`), `bof3-status` (`status`), `bof3-tools` (`decomp/tools/bof3-tools`), `bof3-player`
+(`player`) and `bof3-wiki` (`wiki`). Each member is a submodule of its public repository.
+Third-party submodules keep their owners' terms and are not changed.
 
 | Area          | The repository has                                                                                                                                                                                                                                  |
 | ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -14,11 +14,11 @@ submodules keep their owners' terms and are not changed.
 | Game data     | No retail bytes, retail text, or extracted assets in the tree or its history; tests that need the disc skip without it; fixtures are synthetic.                                                                                                     |
 | Tools         | `--help` with a one-line purpose, every switch and its default, and runnable examples; the same switch names across commands (`-i/--input`, `-o/--output`, `--list`, `--json`, `-q`); errors say what failed and the next action.                   |
 | Speed         | Every tool and gate step is fast and light: a no-change run is near instant and work scales with what changed (Ninja and Cargo dependency tracking, content-hash caches). A slow step is a bug; measure it with `time` before changing it.          |
-| Build         | bof3-decomp builds natively with Meson and Ninja; Rust projects use Cargo and the site uses npm. The monorepo `Makefile` only forwards to them.                                                                                                     |
+| Build         | bof3-decomp builds natively with Meson and Ninja; Rust projects use Cargo and the site uses npm. The workspace `Makefile` only forwards to them.                                                                                                    |
 | Test output   | Artifacts for manual inspection go under the build folder: Rust integration tests use `CARGO_TARGET_TMPDIR`; other builds use a per-test folder under the build folder. Nothing is written into the source tree.                                    |
 | Format & lint | The formatters and linters run in the gate (`cargo fmt`, `clippy -D warnings`, `clang-format`, `dprint`, `tsc`, `ruff`); one config per repository.                                                                                                 |
 | CI            | CI runs the documented checks that need no game media. Maintainers run disc-dependent checks before merging. The workspace checks Markdown and the wiki; each member owns its source checks.                                                        |
-| Wiki          | The wiki states specs only: layouts, offsets, values, behaviour, limits and sequences. Evidence is `Name (image@0xADDR)`. It names no repository, tool, build step, source path or code block; a reader needs none of them.                         |
+| Wiki          | The wiki states specs only: layouts, offsets, values, behavior, limits and sequences. Evidence is `Name (image@0xADDR)`. It names no repository, tool, build step, source path or code block; a reader needs none of them.                          |
 | Prose         | READMEs, docs, comments and help text are plain and current: no history, no hedging, no filler.                                                                                                                                                     |
 | Commits       | Conventional subjects; no AI attribution or session trailers.                                                                                                                                                                                       |
-| Going public  | History holds nothing the tree may not (filtered or fresh first commit); the owner creates the repository and pushes; the monorepo then consumes it as a submodule.                                                                                 |
+| Going public  | History holds nothing the tree may not (filtered or fresh first commit); the owner creates the repository and pushes; the workspace then consumes it as a submodule.                                                                                |
