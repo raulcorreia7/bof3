@@ -1,26 +1,55 @@
 # Agent guidance
 
-Work in the project that owns the change. Read its `AGENTS.md` when present, then
-its `README.md`. Preserve unrelated changes and existing submodule pins.
+This is the workspace of the *Breath of Fire III* (PS1) projects. Each project is a Git submodule
+with its own `AGENTS.md`, checks and commits. Work in the project that owns the change: read its
+`AGENTS.md`, then its `README.md`.
 
-| Change                                     | Read                                                                                                                                                                                                                                                     |
-| ------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Shared builds or workspace documentation   | [README.md](README.md), [CONTRIBUTING.md](CONTRIBUTING.md)                                                                                                                                                                                               |
-| Game code, matching or decompilation setup | [decomp/AGENTS.md](https://github.com/raulcorreia7/bof3-decomp/blob/main/AGENTS.md), [decomp/README.md](https://github.com/raulcorreia7/bof3-decomp/blob/main/README.md), [skills](https://github.com/raulcorreia7/bof3-decomp/tree/main/.agents/skills) |
-| Audio and player                           | [player/AGENTS.md](https://github.com/raulcorreia7/bof3-player/blob/main/AGENTS.md), [player/README.md](https://github.com/raulcorreia7/bof3-player/blob/main/README.md)                                                                                 |
-| Progress site                              | [status/AGENTS.md](https://github.com/raulcorreia7/bof3-status/blob/main/AGENTS.md), [status/README.md](https://github.com/raulcorreia7/bof3-status/blob/main/README.md)                                                                                 |
-| Rust disc and archive tools                | [tools/AGENTS.md](https://github.com/raulcorreia7/bof3-tools/blob/main/AGENTS.md), [tools/README.md](https://github.com/raulcorreia7/bof3-tools/blob/main/README.md)                                                                                     |
-| Game and file-format facts                 | [wiki](https://raulcorreia7.github.io/bof3-wiki/)                                                                                                                                                                                                        |
-| Project maintenance standards              | [project standard](docs/standard.md)                                                                                                                                                                                                                     |
+## Where things are
 
-Each submodule owns its commits and checks. Change a parent pin after the child
-commit is available. Keep game data, build output and local backups
-outside the tracked tree. Update generated files through their generator.
+Paths are relative to this folder. A member folder is empty until you initialize it: run
+`make init-<name>` (for example `make init-game`) or `git submodule update --init <path>`.
+
+| Path                       | Project                                    | Agent guide                                                            | Repository                                                 |
+| -------------------------- | ------------------------------------------ | ---------------------------------------------------------------------- | ---------------------------------------------------------- |
+| `decomp/`                  | Matching decompilation (C89, GCC 2.7.2)    | [decomp/AGENTS.md](decomp/AGENTS.md)                                   | [bof3-decomp](https://github.com/raulcorreia7/bof3-decomp) |
+| `decomp/tools/bof3-tools/` | Rust disc and EMI archive tools (`bof3`)   | [decomp/tools/bof3-tools/AGENTS.md](decomp/tools/bof3-tools/AGENTS.md) | [bof3-tools](https://github.com/raulcorreia7/bof3-tools)   |
+| `player/`                  | Audio player and Rust audio crates         | [player/AGENTS.md](player/AGENTS.md)                                   | [bof3-player](https://github.com/raulcorreia7/bof3-player) |
+| `status/`                  | Progress site                              | [status/AGENTS.md](status/AGENTS.md)                                   | [bof3-status](https://github.com/raulcorreia7/bof3-status) |
+| `wiki/`                    | Game and file-format specs                 | [wiki/AGENTS.md](wiki/AGENTS.md)                                       | [bof3-wiki](https://github.com/raulcorreia7/bof3-wiki)     |
+| `docs/standard.md`         | The bar every project meets                | [project standard](docs/standard.md)                                   | this repository                                            |
+| `Makefile`, `tools/`       | Workspace front door and submodule scripts | `make help`                                                            | this repository                                            |
+
+## Find the guide for a task
+
+| Task                                       | Read first                                                                                                        |
+| ------------------------------------------ | ----------------------------------------------------------------------------------------------------------------- |
+| Match, name or restructure game code       | [decomp/AGENTS.md](decomp/AGENTS.md), then [the `decomp` skill](decomp/.agents/skills/decomp/SKILL.md)            |
+| Build setup, toolchain, Meson              | [decomp/docs/toolchain.md](decomp/docs/toolchain.md)                                                              |
+| Disc or EMI extraction, the `bof3` command | [decomp/tools/bof3-tools/AGENTS.md](decomp/tools/bof3-tools/AGENTS.md)                                            |
+| Music, sound, the player                   | [player/AGENTS.md](player/AGENTS.md)                                                                              |
+| The progress page                          | [status/AGENTS.md](status/AGENTS.md)                                                                              |
+| A game or file-format fact                 | [wiki/AGENTS.md](wiki/AGENTS.md) to edit; the [published wiki](https://raulcorreia7.github.io/bof3-wiki/) to read |
+| Workspace builds, submodules, shared docs  | [README.md](README.md), [CONTRIBUTING.md](CONTRIBUTING.md), `make help`                                           |
+
+## Checks
+
+- `make check` checks the shared docs and config and builds the wiki.
+- `make check-<game|tools|player|status>` runs one project's checks; `make check-all` runs them all.
+- Each project's own guide names its full gate; run that gate inside the project before a report.
+
+## Rules
+
+- Each submodule owns its commits and checks. Change a parent pin only after the child commit is on
+  the child's `main`.
+- Preserve unrelated changes and the existing submodule pins.
+- Keep game data, build output and local backups outside the tracked tree.
+- Update generated files through their generator.
 
 ## Writing
 
 Docs, comments, commit messages and pull requests follow one standard.
 
+- **Current.** Present tense, no history.
 - **What, not how.** Say what a thing does and why. The code shows how.
 - **ASD-STE100** is the basis for technical text: short sentences, one instruction per sentence,
   active voice, one term for one concept, numbered steps for a procedure. Exact technical terms
@@ -33,3 +62,4 @@ Docs, comments, commit messages and pull requests follow one standard.
   5. Never use a foreign phrase, a scientific word or a jargon word if you can think of an everyday
      English equivalent.
   6. Break any of these rules sooner than say anything outright barbarous.
+- Comments say what, never how: one line, only where a name cannot say it ([standard](docs/standard.md#comments)).
