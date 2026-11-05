@@ -51,7 +51,8 @@ Everything an agent can read, in one list. Initialize a member before you open i
 
 - Skills: [decomp/.agents/skills/decomp/SKILL.md](decomp/.agents/skills/decomp/SKILL.md) is the only
   skill. Its references are in `decomp/.agents/skills/decomp/references/`: `match.md`, `name.md`,
-  `refactor.md`, `research.md`, `review.md`, `tool.md`.
+  `refactor.md`, `research.md`, `review.md`, `tool.md`. `.agents/skills` and `.claude/skills` link to
+  it, so an agent started here loads it once `decomp` is initialized.
 - Tools: `make help` here; [decomp/tools/README.md](decomp/tools/README.md) for the decomp tools;
   [decomp/tools/bof3-tools/docs/cli.md](decomp/tools/bof3-tools/docs/cli.md) for `bof3`;
   [player/docs/player.md](player/docs/player.md) for `bof3player`. Every tool takes `--help`.
