@@ -45,6 +45,22 @@ Paths are relative to this folder. A member folder is empty until you initialize
 - Keep game data, build output and local backups outside the tracked tree.
 - Update generated files through their generator.
 
+## Index
+
+Everything an agent can read, in one list. Initialize a member before you open its paths.
+
+- Skills: [decomp/.agents/skills/decomp/SKILL.md](decomp/.agents/skills/decomp/SKILL.md) is the only
+  skill. Its references are in `decomp/.agents/skills/decomp/references/`: `match.md`, `name.md`,
+  `refactor.md`, `research.md`, `review.md`, `tool.md`.
+- Tools: `make help` here; [decomp/tools/README.md](decomp/tools/README.md) for the decomp tools;
+  [decomp/tools/bof3-tools/docs/cli.md](decomp/tools/bof3-tools/docs/cli.md) for `bof3`;
+  [player/docs/player.md](player/docs/player.md) for `bof3player`. Every tool takes `--help`.
+- Docs: [decomp/docs/README.md](decomp/docs/README.md) lists every decomp page; each member's
+  `README.md` and `docs/` hold the rest.
+- CI: `.github/workflows/docs.yml` here; each member has its own `.github/workflows/`.
+- Wiki: edit in [wiki/](wiki/AGENTS.md); read the [site](https://raulcorreia7.github.io/bof3-wiki/). For a model: [llms.txt](https://raulcorreia7.github.io/bof3-wiki/llms.txt) (index), [llms-small.txt](https://raulcorreia7.github.io/bof3-wiki/llms-small.txt) (compact, for a small context), [llms-full.txt](https://raulcorreia7.github.io/bof3-wiki/llms-full.txt) (everything).
+- Standard: [docs/standard.md](docs/standard.md).
+
 ## Writing
 
 Docs, comments, commit messages and pull requests follow one standard.
