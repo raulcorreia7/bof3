@@ -26,13 +26,15 @@ is a fan project, not affiliated with or endorsed by Capcom. *Breath of Fire* is
 ## Quick start
 
 ```sh
-git clone --recurse-submodules https://github.com/raulcorreia7/bof3.git
+git clone https://github.com/raulcorreia7/bof3.git
 cd bof3
 make help
 ```
 
-Without `--recurse-submodules`, `make` clones the submodule a target needs the first time you run
-it. To work in a member without `make`, run `git submodule update --init -- PATH`.
+Do not pass `--recurse-submodules`: it also fetches nested pins the build
+never reads. `make` clones the submodule a target needs the first time you run it. To work in a member without
+`make`, run `git submodule update --init -- PATH`. `make doctor` lists the host tools each target
+needs and which are missing.
 
 Pick what you want to change:
 
@@ -57,7 +59,7 @@ Run `make init-game` to clone bof3-decomp and put the disc files in `decomp/inpu
 the retail bytes.
 
 Without a disc, `make setup SETUP_ARGS="--dev --no-payloads"` installs the toolchain, and
-`meson compile -C decomp/build/meson check-tree include-asm` runs the checks that need no game data.
+`make check-game-free` runs the checks that need no game data (Meson `pre-push`).
 The tools, player, site and wiki build and check without game data.
 
 `make build-all` builds every project, and each project has its own target:
