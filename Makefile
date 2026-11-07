@@ -26,7 +26,7 @@ JOBS ?= $(patsubst -j%,%,$(filter -j%,$(MAKEFLAGS)))
 endif
 JOBS := $(or $(JOBS),$(DEFAULT_JOBS))
 
-.PHONY: help status sync init-game init-tools init-player init-status init-wiki setup build build-all build-tools build-player build-player-gui build-status test format lint wiki check check-all check-game check-tools check-player check-status clean distclean
+.PHONY: help status sync init-game init-tools init-player init-status init-wiki setup build build-all build-tools build-player build-player-gui build-status test format lint wiki check check-all check-game check-game-free doctor check-game-free doctor check-tools check-player check-status clean distclean
 
 help:
 	@echo "BOF3 monorepo front door: $(CURDIR)"
@@ -47,6 +47,8 @@ help:
 	@echo "  lint      Lint disc/archive tools."
 	@echo "  wiki      Build the wiki into wiki/dist (Node/npm)."
 	@echo "  check     Check shared docs/config and build the wiki."
+	@echo "  check-game-free Run the decomp gate that needs no disc (Meson pre-push)."
+	@echo "  doctor    List the host tools each target needs and report the missing ones."
 	@echo "  check-game/check-tools/check-player/check-status Check one project."
 	@echo "  check-all Check shared docs and every project."
 	@echo "  clean     Remove build output, scratch and caches here and in the members; keep the extracted disc."
@@ -135,6 +137,13 @@ check:
 check-game: $(GAME_BUILD)/build.ninja
 	meson compile -C $(GAME_BUILD) -j $(JOBS) check
 
+# The decomp gate without a disc: after `make setup SETUP_ARGS="--dev --no-payloads"`.
+check-game-free: $(GAME_BUILD)/build.ninja
+	meson compile -C $(GAME_BUILD) -j $(JOBS) pre-push
+
+doctor:
+	@sh tools/doctor.sh
+
 check-tools: init-tools
 	$(MAKE) -C $(TOOLS) check CARGO_TARGET_DIR="$(CURDIR)/$(BUILD_DIR)/rust"
 
@@ -144,8 +153,9 @@ check-player: init-player
 check-status: init-status
 	$(MAKE) -C $(STATUS) check
 
+# Without an extracted disc the game gate is the disc-free one.
 check-all:
-	$(MAKE) check check-game check-tools check-player check-status
+	$(MAKE) check $(if $(wildcard $(DECOMP)/build/disc/BIN),check-game,check-game-free) check-tools check-player check-status
 
 clean:
 	@sh tools/clean.sh clean
