@@ -50,7 +50,7 @@ fi
 
 TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
-curl -fL --retry 3 -o "$TMP/objdiff-cli" \
+curl -fL --retry 5 --retry-delay 5 --retry-all-errors -o "$TMP/objdiff-cli" \
   "https://github.com/encounter/objdiff/releases/download/v$PIN/objdiff-cli-linux-x86_64"
 echo "$SHA256  $TMP/objdiff-cli" | sha256sum -c -
 
