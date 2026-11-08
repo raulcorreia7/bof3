@@ -64,5 +64,5 @@ Everything an agent can read, in one list. Initialize a member before you open i
 
 ## Writing
 
-Docs, comments, commit messages and pull requests follow the [project standard](docs/standard.md#writing): present tense, what and why instead of how, ASD-STE100 and Orwell's six rules.
+Docs, comments, commit messages and pull requests follow the [project standard](docs/standard.md#writing): present tense, what and why instead of how, in the game developer's own terms, and Orwell's six rules.
 Comments say what, never how: one line, only where a name cannot say it ([standard](docs/standard.md#comments)).
