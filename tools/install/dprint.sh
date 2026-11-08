@@ -41,7 +41,7 @@ for arg in "$@"; do
 done
 
 if [[ "$LATEST" == 1 ]]; then
-  REL="$(curl -fsSL --retry 3 https://api.github.com/repos/dprint/dprint/releases/latest)"
+  REL="$(curl -fsSL --retry 5 --retry-delay 5 --retry-all-errors https://api.github.com/repos/dprint/dprint/releases/latest)"
   PIN="$(printf '%s\n' "$REL" | sed -n 's/.*"tag_name": *"\([0-9][0-9.]*\)".*/\1/p' | head -1 || true)"
   SHA256="$(printf '%s\n' "$REL" \
     | grep -A8 '"name": "dprint-x86_64-unknown-linux-gnu.zip"' \
@@ -75,7 +75,7 @@ fi
 
 TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
-curl -fL --retry 3 -o "$TMP/dprint.zip" \
+curl -fL --retry 5 --retry-delay 5 --retry-all-errors -o "$TMP/dprint.zip" \
   "https://github.com/dprint/dprint/releases/download/$PIN/dprint-x86_64-unknown-linux-gnu.zip"
 echo "$SHA256  $TMP/dprint.zip" | sha256sum -c -
 
