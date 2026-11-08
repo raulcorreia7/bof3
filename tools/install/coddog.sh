@@ -49,7 +49,7 @@ fi
 
 TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
-curl -fL --retry 3 -o "$TMP/coddog.tar.xz" \
+curl -fL --retry 5 --retry-delay 5 --retry-all-errors -o "$TMP/coddog.tar.xz" \
   "https://github.com/ethteck/coddog/releases/download/$PIN/coddog-cli-x86_64-unknown-linux-gnu.tar.xz"
 echo "$SHA256  $TMP/coddog.tar.xz" | sha256sum -c -
 

@@ -50,7 +50,7 @@ fi
 
 TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
-curl -fL --retry 3 -o "$TMP/rizin.tar.xz" \
+curl -fL --retry 5 --retry-delay 5 --retry-all-errors -o "$TMP/rizin.tar.xz" \
   "https://github.com/rizinorg/rizin/releases/download/v$PIN/rizin-v$PIN-static-x86_64.tar.xz"
 echo "$SHA256  $TMP/rizin.tar.xz" | sha256sum -c -
 

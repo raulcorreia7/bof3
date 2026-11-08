@@ -50,7 +50,7 @@ fi
 
 TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
-curl -fL --retry 3 -o "$TMP/uv.tar.gz" \
+curl -fL --retry 5 --retry-delay 5 --retry-all-errors -o "$TMP/uv.tar.gz" \
   "https://github.com/astral-sh/uv/releases/download/$PIN/uv-x86_64-unknown-linux-gnu.tar.gz"
 echo "$SHA256  $TMP/uv.tar.gz" | sha256sum -c -
 
