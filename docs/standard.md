@@ -53,6 +53,10 @@ cannot:
 - its source: the game function and address, the Sony manual chapter or the psx-spx section;
 - a constraint the next editor must keep (a fixed size, an order the bytes require).
 
+Write the comment in the game's terms, as the designer would describe the behaviour, not the
+mechanism: `/* Orbits the effect around its battler while its timer runs. */`, not "Turns the
+orbiting effect one step around its battler and ages its timers."
+
 Anything else is deleted: a comment that retells the code, its history, the evidence, the tools, a
 rationale, or a section banner. A doc comment on a public item states its contract (what it returns,
 when it fails, its units) in one line where one line does. This holds for C, Rust, TypeScript, shell
