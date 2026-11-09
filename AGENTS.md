@@ -33,6 +33,7 @@ Paths are relative to this folder. A member folder is empty until you initialize
 
 ## Checks
 
+- `make doctor` lists the host tools each target needs; the README `#requirements` section of each project says how to install them.
 - `make check` checks the shared docs and config and builds the wiki.
 - `make check-<game|tools|player|status>` runs one project's checks; `make check-all` runs them all.
 - Each project's own guide names its full gate; run that gate inside the project before a report.
