@@ -46,10 +46,22 @@ Rule 5 never replaces a game or game-development term; those are the everyday wo
 
 ## Comments
 
-Comments say what, never how. They are minimal and high signal: one line, only where a name or a
-type cannot carry the meaning. This holds for C, Rust, TypeScript, shell and YAML. A comment never
-retells the code, its history, the evidence or the tools. Evidence for a name goes in the commit
-body, and in `config/symbols.toml` `source` for decomp names.
+A comment is absolutely minimal. It exists only to say one of three things that a name or a type
+cannot:
+
+- what the thing is or does, in one line;
+- its source: the game function and address, the Sony manual chapter or the psx-spx section;
+- a constraint the next editor must keep (a fixed size, an order the bytes require).
+
+Write the comment in the game's terms, as the designer would describe the behaviour, not the
+mechanism: `/* Orbits the effect around its battler while its timer runs. */`, not "Turns the
+orbiting effect one step around its battler and ages its timers."
+
+Anything else is deleted: a comment that retells the code, its history, the evidence, the tools, a
+rationale, or a section banner. A doc comment on a public item states its contract (what it returns,
+when it fails, its units) in one line where one line does. This holds for C, Rust, TypeScript, shell
+and YAML. Evidence for a name goes in the commit body, and in `config/symbols.toml` `source` for
+decomp names.
 
 Standing exceptions: legal text, tool directives and `@bug`. The decomp exceptions (`FAKE:` notes
 and the `INCLUDE_ASM` line) are in the
