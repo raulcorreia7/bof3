@@ -2,6 +2,7 @@
 build/
 dist/
 /bin/bof3
+/bin/bof3-edit
 /bin/bof3player
 /bin/bof3player-tui
 /bin/bof3player-gui
