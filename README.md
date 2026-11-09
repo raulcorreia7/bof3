@@ -21,7 +21,7 @@ is a fan project, not affiliated with or endorsed by Capcom. *Breath of Fire* is
 | [bof3-status](https://github.com/raulcorreia7/bof3-status) | `status/`                  | Decompilation progress from the generated report.      | [![CI](https://github.com/raulcorreia7/bof3-status/actions/workflows/deploy.yml/badge.svg?branch=main)](https://github.com/raulcorreia7/bof3-status/actions) |
 | [bof3-wiki](https://raulcorreia7.github.io/bof3-wiki/)     | `wiki/`                    | Shared game and file-format facts.                     | [![Pages](https://github.com/raulcorreia7/bof3-wiki/actions/workflows/pages.yml/badge.svg?branch=main)](https://github.com/raulcorreia7/bof3-wiki/actions)   |
 
-`make build-tools` builds the `bof3` command and installs it as `bin/bof3`.
+`make build-tools` builds the `bof3` command and the `bof3-edit` asset editor and installs them as `bin/bof3` and `bin/bof3-edit`.
 
 ## Quick start
 
@@ -66,7 +66,7 @@ The tools, player, site and wiki build and check without game data.
 
 ```sh
 make build             # game images (Meson)
-make build-tools       # disc/archive tools; bin/bof3
+make build-tools       # disc/archive tools; bin/bof3, bin/bof3-edit
 make build-player      # CLI and terminal player
 make build-player-gui  # graphical player
 make build-status      # status site; requires Node/npm

@@ -8,6 +8,7 @@ case "${1:-}" in
         [ "$#" -eq 1 ] || exit 2
         mkdir -p bin
         ln -sfn ../build/rust/release/bof3 bin/bof3
+        ln -sfn ../build/rust/release/bof3-edit bin/bof3-edit
         ;;
     player|player-gui)
         [ "$#" -eq 1 ] || exit 2
