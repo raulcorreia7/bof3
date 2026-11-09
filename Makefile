@@ -1,4 +1,4 @@
-# BOF3 monorepo front door. Each submodule owns its build and checks.
+# BOF3 workspace front door. Each submodule owns its build and checks.
 
 .DEFAULT_GOAL := help
 
@@ -26,15 +26,16 @@ JOBS ?= $(patsubst -j%,%,$(filter -j%,$(MAKEFLAGS)))
 endif
 JOBS := $(or $(JOBS),$(DEFAULT_JOBS))
 
-.PHONY: help status sync init-game init-tools init-player init-status init-wiki setup build build-all build-tools build-player build-player-gui build-status test format lint wiki check check-all check-game check-game-free doctor check-game-free doctor check-tools check-player check-status clean distclean
+.PHONY: help status sync init-game init-tools init-player init-status init-wiki setup build build-all build-tools build-player build-player-gui build-status test format lint wiki check check-all check-game check-game-free doctor check-tools check-player check-status clean distclean
 
 help:
-	@echo "BOF3 monorepo front door: $(CURDIR)"
+	@echo "BOF3 workspace front door: $(CURDIR)"
 	@echo ""
 	@echo "Targets:"
 	@echo "  help      List these targets (default)."
 	@echo "  status    Show root and nested submodule revisions (no changes)."
 	@echo "  sync      Explicitly update all members and nested tools to their pins."
+	@echo "  init-game/init-tools/init-player/init-status/init-wiki Clone one project at its pinned commit."
 	@echo "  setup     Initialize decomp, run its setup (needs your disc) and configure Meson."
 	@echo "  build     Build decomp's 428 game images with Meson; checks run separately."
 	@echo "  build-all Build game, tools, both player interfaces and status."
