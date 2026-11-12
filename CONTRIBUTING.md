@@ -9,16 +9,9 @@ problem privately ([SECURITY.md](SECURITY.md)).
 Each project is a submodule that owns its source, documentation and checks. This workspace owns the
 `make` entry points and the pins.
 
-| Change                                     | Start here                                                                           |
-| ------------------------------------------ | ------------------------------------------------------------------------------------ |
-| Game code, matching or decompilation setup | [bof3-decomp](https://github.com/raulcorreia7/bof3-decomp/blob/main/CONTRIBUTING.md) |
-| Disc, archive or asset tools               | [bof3-tools](https://github.com/raulcorreia7/bof3-tools/blob/main/CONTRIBUTING.md)   |
-| Music, sound or player interfaces          | [bof3-player](https://github.com/raulcorreia7/bof3-player/blob/main/CONTRIBUTING.md) |
-| Progress site                              | [bof3-status](https://github.com/raulcorreia7/bof3-status/blob/main/CONTRIBUTING.md) |
-| Game and format documentation              | [bof3-wiki](https://github.com/raulcorreia7/bof3-wiki/blob/main/CONTRIBUTING.md)     |
-| Shared builds, shared docs, pins           | This repository                                                                      |
-
-Set up the project first: [README](README.md#choose-a-goal).
+The README [goal router](README.md#choose-a-goal) says which project owns a change and how to
+initialize it. Each project's `CONTRIBUTING.md` says how to contribute to it; this page covers the
+workspace.
 
 ## Make a change
 
@@ -36,18 +29,10 @@ Set up the project first: [README](README.md#choose-a-goal).
 
 ## Gate
 
-| Change                 | Command                             |
-| ---------------------- | ----------------------------------- |
-| Shared docs and config | `make check`                        |
-| Game code              | `make check-game` (needs your disc) |
-| Game code, no disc     | `make check-game-free`              |
-| Tools                  | `make check-tools`                  |
-| Player                 | `make check-player`                 |
-| Progress site          | `make check-status`                 |
-| Everything             | `make check-all`                    |
+A workspace change runs `make check`; a member change runs that member's gate, named in the project
+guide the [goal router](README.md#choose-a-goal) links.
 
-Each project's own guide names its full gate. `make format` formats shared Markdown, JSON and TOML;
-`make format CHECK=1` verifies it.
+`make format` formats shared Markdown, JSON and TOML; `make format CHECK=1` verifies it.
 
 ## What never lands
 
