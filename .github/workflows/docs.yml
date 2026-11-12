@@ -30,14 +30,18 @@ jobs:
           make status
           make clean
           test ! -e meson.build
+      - name: Initialize the wiki submodule
+        run: make init-wiki
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 22
+          cache: npm
+          cache-dependency-path: wiki/package-lock.json
       - name: Cache documentation tools
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/.local/bin/dprint
-          key: dprint-0.64.3-linux-x64
+          key: dprint-0.64.3-${{ runner.os }}-${{ hashFiles('tools/install/dprint.sh') }}
       - name: Install documentation tools
         run: |
           bash tools/install/dprint.sh
