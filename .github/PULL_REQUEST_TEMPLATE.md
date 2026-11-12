@@ -14,5 +14,5 @@
 
 ## Checks
 
-- [ ] `make check` passes.
+- [ ] The gate of the repository you changed passes.
 - [ ] No game data, disc images or extracted assets are included.

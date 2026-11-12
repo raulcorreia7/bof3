@@ -6,18 +6,11 @@ with its own `AGENTS.md`, checks and commits. Work in the project that owns the 
 
 ## Where things are
 
-Paths are relative to this folder. A member folder is empty until you initialize it: run
-`make init-<name>` (for example `make init-game`) or `git submodule update --init <path>`.
-
-| Path                       | Project                                    | Agent guide                                                            | Repository                                                 |
-| -------------------------- | ------------------------------------------ | ---------------------------------------------------------------------- | ---------------------------------------------------------- |
-| `decomp/`                  | Matching decompilation (C89, GCC 2.7.2)    | [decomp/AGENTS.md](decomp/AGENTS.md)                                   | [bof3-decomp](https://github.com/raulcorreia7/bof3-decomp) |
-| `decomp/tools/bof3-tools/` | Rust disc and EMI archive tools (`bof3`)   | [decomp/tools/bof3-tools/AGENTS.md](decomp/tools/bof3-tools/AGENTS.md) | [bof3-tools](https://github.com/raulcorreia7/bof3-tools)   |
-| `player/`                  | Audio player and Rust audio crates         | [player/AGENTS.md](player/AGENTS.md)                                   | [bof3-player](https://github.com/raulcorreia7/bof3-player) |
-| `status/`                  | Progress site                              | [status/AGENTS.md](status/AGENTS.md)                                   | [bof3-status](https://github.com/raulcorreia7/bof3-status) |
-| `wiki/`                    | Game and file-format specs                 | [wiki/AGENTS.md](wiki/AGENTS.md)                                       | [bof3-wiki](https://github.com/raulcorreia7/bof3-wiki)     |
-| `docs/standard.md`         | The bar every project meets                | [project standard](docs/standard.md)                                   | this repository                                            |
-| `Makefile`, `tools/`       | Workspace front door and submodule scripts | `make help`                                                            | this repository                                            |
+Paths are relative to this folder. The member folders are `decomp/`, `player/`, `status/` and
+`wiki/`; `decomp/tools/bof3-tools/` is a nested submodule. A member folder is empty until you
+initialize it: run `make init-<name>` (for example `make init-game`). `make init-tools` also
+initializes `decomp`, because the tools live inside it. `git submodule update --init <path>` works
+for a top-level member but does not reach `decomp/tools/bof3-tools`.
 
 ## Find the guide for a task
 
@@ -33,7 +26,8 @@ Paths are relative to this folder. A member folder is empty until you initialize
 
 ## Checks
 
-- `make doctor` lists the host tools each target needs; the README `#requirements` section of each project says how to install them.
+- `make doctor` is a partial list of the host tools; each project's README `#requirements` is the
+  full list.
 - `make check` checks the shared docs and config and builds the wiki.
 - `make check-<game|tools|player|status>` runs one project's checks; `make check-all` runs them all.
 - Each project's own guide names its full gate; run that gate inside the project before a report.

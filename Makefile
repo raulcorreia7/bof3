@@ -31,20 +31,20 @@ help:
 	@echo "  status    Show root and nested submodule revisions (no changes)."
 	@echo "  sync      Explicitly update all members and nested tools to their pins."
 	@echo "  init-game/init-tools/init-player/init-status/init-wiki Clone one project at its pinned commit."
-	@echo "  setup     Initialize decomp, run its setup (needs your disc) and configure Meson."
+	@echo "  setup     Initialize decomp, run its setup (disc optional) and configure Meson."
 	@echo "  build     Build decomp's 428 game images with Meson; checks run separately."
 	@echo "  build-all Build game, tools, both player interfaces and status."
 	@echo "  build-tools Build disc/archive tools."
 	@echo "  build-player Build the CLI and terminal player."
 	@echo "  build-player-gui Build the graphical player."
 	@echo "  build-status Build the status site (Node/npm)."
-	@echo "  format    Format shared docs/config with system dprint; CHECK=1 checks."
+	@echo "  format    Format shared docs/config with dprint on PATH; CHECK=1 checks."
 	@echo "  check     Check shared docs/config and build the wiki."
 	@echo "  check-game-free Run the decomp gate that needs no disc (Meson pre-push)."
 	@echo "  doctor    List the host tools each target needs and report the missing ones."
 	@echo "  check-game/check-tools/check-player/check-status Check one project."
 	@echo "  check-all Check shared docs and every project."
-	@echo "  clean     Remove build output, scratch and caches here and in the members; keep the extracted disc."
+	@echo "  clean     Clean Meson, the status build and caches; keep the disc, venv, Rust builds and bin/."
 	@echo "  distclean clean, then the Meson build, the venvs and the Rust build; run 'make setup' after."
 	@echo ""
 	@echo "Variables:"
@@ -110,7 +110,7 @@ format:
 	@command -v dprint >/dev/null 2>&1 || { echo "make: dprint is not installed. Run: bash tools/install/dprint.sh (then put ~/.local/bin on PATH)" >&2; exit 1; }
 	dprint $(if $(CHECK),check,fmt)
 
-# Shared checks do not require the game, Rust, or Node toolchains.
+# Needs dprint, Node and Python; not the game or Rust toolchains.
 check: init-wiki
 	$(MAKE) format CHECK=1
 	cd wiki && npm ci && npm run check && npm run build

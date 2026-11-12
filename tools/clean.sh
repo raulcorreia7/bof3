@@ -10,7 +10,7 @@ case "${1:-}" in
 esac
 
 # Game: remove built images, objects and scratch. The Meson configuration and the extracted disc
-# (build/disc, build/bin) stay, so `make build` needs no setup.
+# (build/disc) stay; decomp keeps its materialized payloads in build/bin.
 if [ -f decomp/build/meson/build.ninja ]; then meson compile -C decomp/build/meson --clean; fi
 rm -rf decomp/work decomp/build/report.json
 if [ -f status/Makefile ]; then make -C status clean; fi
