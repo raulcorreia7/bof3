@@ -69,7 +69,6 @@ make build-tools       # bin/bof3 and bin/bof3-edit
 make build-player      # CLI and terminal player
 make build-player-gui  # graphical player
 make build-status      # status site
-make wiki              # wiki site
 ```
 
 `make build-tools` and the player targets stage native binaries in `bin/`. Run those, not

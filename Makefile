@@ -11,11 +11,6 @@ BUILD_DIR := build
 # Where cargo builds. The root BUILD_DIR is ignored by git.
 export CARGO_TARGET_DIR ?= $(CURDIR)/$(BUILD_DIR)/rust
 
-# Wall-clock limit of a cargo test run and the niced wrapper that applies it; the whole process
-# tree ends when the limit passes.
-TEST_TIMEOUT ?= 45m
-TEST_RUN = timeout -k 30 $(TEST_TIMEOUT) nice -n 10
-
 # Options of decomp/tools/setup.sh. --dev adds Ruff and pytest, which format-check and meson test need.
 SETUP_ARGS ?= --dev
 
@@ -26,7 +21,7 @@ JOBS ?= $(patsubst -j%,%,$(filter -j%,$(MAKEFLAGS)))
 endif
 JOBS := $(or $(JOBS),$(DEFAULT_JOBS))
 
-.PHONY: help status sync init-game init-tools init-player init-status init-wiki setup build build-all build-tools build-player build-player-gui build-status test format lint wiki check check-all check-game check-game-free doctor check-tools check-player check-status clean distclean
+.PHONY: help status sync init-game init-tools init-player init-status init-wiki setup build build-all build-tools build-player build-player-gui build-status format check check-all check-game check-game-free doctor check-tools check-player check-status clean distclean
 
 help:
 	@echo "BOF3 workspace front door: $(CURDIR)"
@@ -43,10 +38,7 @@ help:
 	@echo "  build-player Build the CLI and terminal player."
 	@echo "  build-player-gui Build the graphical player."
 	@echo "  build-status Build the status site (Node/npm)."
-	@echo "  test      Run disc/archive tool tests."
 	@echo "  format    Format shared docs/config with system dprint; CHECK=1 checks."
-	@echo "  lint      Lint disc/archive tools."
-	@echo "  wiki      Build the wiki into wiki/dist (Node/npm)."
 	@echo "  check     Check shared docs/config and build the wiki."
 	@echo "  check-game-free Run the decomp gate that needs no disc (Meson pre-push)."
 	@echo "  doctor    List the host tools each target needs and report the missing ones."
@@ -59,7 +51,6 @@ help:
 	@echo "  JOBS=N          Parallel jobs (default: nproc; 'make -j N' sets it)."
 	@echo "  SETUP_ARGS=...  Options of decomp/tools/setup.sh (default --dev); also --matching, --no-payloads."
 	@echo "  CHECK=1         format: verify only."
-	@echo "  TEST_TIMEOUT=D  Wall-clock limit of each cargo test run (default 45m)."
 
 # Submodule handling lives in tools/submodules.sh.
 init-game:
@@ -114,26 +105,15 @@ build-player-gui: init-player
 build-status: init-status
 	$(MAKE) -C $(STATUS) build
 
-test: init-tools
-	$(TEST_RUN) $(MAKE) -C $(TOOLS) test CARGO_TARGET_DIR="$(CURDIR)/$(BUILD_DIR)/rust"
-
 # Shared documentation and configuration. Each member owns its source formatting.
 format:
 	@command -v dprint >/dev/null 2>&1 || { echo "make: dprint is not installed. Run: bash tools/install/dprint.sh (then put ~/.local/bin on PATH)" >&2; exit 1; }
 	dprint $(if $(CHECK),check,fmt)
 
-lint: init-tools
-	$(MAKE) -C $(TOOLS) lint CARGO_TARGET_DIR="$(CURDIR)/$(BUILD_DIR)/rust"
-
-# Build the wiki submodule (Astro Starlight) into wiki/dist, which the wiki ignores.
-# Needs Node.js 22.23.4 or later.
-wiki: init-wiki
-	cd wiki && npm ci && npm run check && npm run build
-
 # Shared checks do not require the game, Rust, or Node toolchains.
-check:
+check: init-wiki
 	$(MAKE) format CHECK=1
-	$(MAKE) wiki
+	cd wiki && npm ci && npm run check && npm run build
 
 check-game: $(GAME_BUILD)/build.ninja
 	meson compile -C $(GAME_BUILD) -j $(JOBS) check

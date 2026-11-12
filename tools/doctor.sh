@@ -22,10 +22,10 @@ need 'check, format' dprint
 need 'setup, build, check-game, check-game-free' curl 7z uv meson ninja cc
 need 'build-tools, check-tools, build-player, check-player' cargo
 need 'check-tools, check-player' cargo-deny
-need 'check-status, wiki' node npm
+need 'check, check-status' node npm
 
 if [ "$missing" -eq 1 ]; then
-    echo 'Install commands: bash tools/install/host.sh format|game|analysis; cargo install cargo-deny --locked.'
+    echo 'Install missing tools from each project README #requirements; cargo install cargo-deny --locked.'
     echo 'Full list: https://github.com/raulcorreia7/bof3-decomp/blob/main/docs/toolchain.md#host-tools'
     exit 1
 fi
