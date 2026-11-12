@@ -7,7 +7,7 @@ Do not attach game data.
 
 ## Scope
 
-The workspace `Makefile`, its scripts and the installers in `tools/install/` download and run tools; a flaw in them is in scope. A problem in a member project belongs in that project's repository.
+The workspace `Makefile`, its scripts and `tools/install/dprint.sh` download and run tools; a flaw in them is in scope. A problem in a member project belongs in that project's repository.
 
 ## Supported versions
 
