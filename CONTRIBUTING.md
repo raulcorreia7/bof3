@@ -77,10 +77,9 @@ git commit -m "chore(submodules): update player"
    [README](https://github.com/raulcorreia7/bof3-decomp#readme) and
    [CONTRIBUTING](https://github.com/raulcorreia7/bof3-decomp/blob/main/CONTRIBUTING.md) show how.
 
-## Shared tool installers
+## Shared tool installer
 
-Each `tools/install/` script is standalone. It may repeat the download and checksum steps of its
-neighbours so that it reads and runs alone.
+`tools/install/dprint.sh` installs the pinned dprint that `make check` and `make format` use.
 
 ## License
 
