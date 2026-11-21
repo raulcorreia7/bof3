@@ -23,61 +23,36 @@ JOBS := $(or $(JOBS),$(DEFAULT_JOBS))
 
 .PHONY: help status sync init-game init-tools init-player init-status init-wiki setup build build-all build-tools build-player build-player-gui build-status format check check-all check-game check-game-free doctor check-tools check-player check-status clean distclean
 
-help:
+help: ## List the targets (default).
 	@echo "BOF3 workspace front door: $(CURDIR)"
-	@echo ""
-	@echo "Targets:"
-	@echo "  help      List these targets (default)."
-	@echo "  status    Show root and nested submodule revisions (no changes)."
-	@echo "  sync      Move all members and nested tools to their pins."
-	@echo "  init-game/init-tools/init-player/init-status/init-wiki Check out one project at its pinned commit."
-	@echo "  setup     Initialize decomp, run its setup (disc optional) and configure Meson."
-	@echo "  build     Build decomp's 428 game images with Meson; checks run separately."
-	@echo "  build-all Build game, tools, both player interfaces and status."
-	@echo "  build-tools Build disc/archive tools."
-	@echo "  build-player Build the CLI and terminal player."
-	@echo "  build-player-gui Build the graphical player."
-	@echo "  build-status Build the status site (Node/npm)."
-	@echo "  format    Format shared docs/config with dprint on PATH; CHECK=1 checks."
-	@echo "  check     Check shared docs/config and build the wiki."
-	@echo "  check-game Run the decomp image check against your disc."
-	@echo "  check-game-free Run the decomp gate that needs no disc (Meson pre-push)."
-	@echo "  doctor    List the host tools each target needs and report the missing ones."
-	@echo "  check-tools/check-player/check-status Check one project."
-	@echo "  check-all Check shared docs and every project."
-	@echo "  clean     Clean Meson, the status build and caches; keep the disc, venv, Rust builds and bin/."
-	@echo "  distclean clean, then the Meson build, the venvs and the Rust build; run 'make setup' after."
-	@echo ""
-	@echo "Variables:"
-	@echo "  JOBS=N          Parallel jobs (default: nproc; 'make -j N' sets it)."
-	@echo "  SETUP_ARGS=...  Options of decomp/tools/setup.sh (default --dev); also --matching, --no-payloads."
-	@echo "  CHECK=1         format: verify only."
+	@awk -F':.*## ' '/^[a-z-]+:.*## /{printf "  %-16s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
+	@echo "Variables: JOBS=N (parallel jobs), SETUP_ARGS=... (setup.sh options, default --dev), CHECK=1 (format: verify only)."
 
 # Submodule handling lives in tools/submodules.sh.
-init-game:
+init-game: ## Clone decomp at its pinned commit.
 	@sh tools/submodules.sh init game
 
-init-tools: init-game
+init-tools: init-game ## Clone decomp and its nested bof3-tools.
 	@sh tools/submodules.sh init tools
 
-init-player:
+init-player: ## Clone the player.
 	@sh tools/submodules.sh init player
 
-init-status:
+init-status: ## Clone the status page.
 	@sh tools/submodules.sh init status
 
-init-wiki:
+init-wiki: ## Clone the wiki.
 	@sh tools/submodules.sh init wiki
 
-status:
+status: ## Show root and nested submodule revisions.
 	@sh tools/submodules.sh status
 
 # Explicit: this can move clean submodule checkouts back to their pins.
-sync:
+sync: ## Move all members and nested tools to their pins.
 	@sh tools/submodules.sh sync
 
 # Setup installs the toolchain and extracts the disc, then (re)configures Meson to see them.
-setup: init-game
+setup: init-game ## Run the decomp setup (disc optional) and configure Meson.
 	sh $(DECOMP)/tools/setup.sh $(SETUP_ARGS)
 	meson setup $(if $(wildcard $(GAME_BUILD)/build.ninja),--reconfigure) $(GAME_BUILD) $(DECOMP)
 
@@ -85,62 +60,62 @@ setup: init-game
 $(GAME_BUILD)/build.ninja: | init-game
 	meson setup $(GAME_BUILD) $(DECOMP)
 
-build: $(GAME_BUILD)/build.ninja
+build: $(GAME_BUILD)/build.ninja ## Build decomp's game images with Meson.
 	meson compile -C $(GAME_BUILD) -j $(JOBS)
 
-build-all:
+build-all: ## Build the game, tools, both players and the status page.
 	$(MAKE) $(if $(filter -j%,$(MAKEFLAGS)),,-j$(JOBS)) JOBS=$(JOBS) build-tools build-player build-player-gui build build-status
 
-build-tools: init-tools
+build-tools: init-tools ## Build the disc and archive tools.
 	$(MAKE) -C $(TOOLS) build CARGO_TARGET_DIR="$(CURDIR)/$(BUILD_DIR)/rust"
 	@sh tools/stage.sh tools
 
-build-player: init-player
+build-player: init-player ## Build the player CLI and terminal interface.
 	$(MAKE) -C player build-cli CARGO_TARGET_DIR="$(CURDIR)/$(BUILD_DIR)/audio"
 	@sh tools/stage.sh player
 
-build-player-gui: init-player
+build-player-gui: init-player ## Build the graphical player.
 	$(MAKE) -C player build-gui CARGO_TARGET_DIR="$(CURDIR)/$(BUILD_DIR)/audio"
 	@sh tools/stage.sh player-gui
 
-build-status: init-status
+build-status: init-status ## Build the status page.
 	cd $(STATUS) && npm ci && npm run build
 
 # Shared documentation and configuration. Each member owns its source formatting.
-format:
+format: ## Format shared docs and config with dprint.
 	@command -v dprint >/dev/null 2>&1 || { echo "make: dprint is not installed. Run: bash tools/install/dprint.sh (then put ~/.local/bin on PATH)" >&2; exit 1; }
 	dprint $(if $(CHECK),check,fmt)
 
-# Needs dprint, Node and Python; not the game or Rust toolchains.
-check: init-wiki
+# Needs dprint, Node, Python and Chrome; not the game or Rust toolchains.
+check: init-wiki ## Check shared docs and config, and the wiki.
 	$(MAKE) format CHECK=1
-	cd wiki && npm ci && npm run check && npm run build
+	cd wiki && npm ci && npm run check
 
-check-game: $(GAME_BUILD)/build.ninja
+check-game: $(GAME_BUILD)/build.ninja ## Run the full decomp gate (needs the disc).
 	meson compile -C $(GAME_BUILD) -j $(JOBS) check
 
 # The decomp gate without a disc: after `make setup SETUP_ARGS="--dev --no-payloads"`.
-check-game-free: $(GAME_BUILD)/build.ninja
+check-game-free: $(GAME_BUILD)/build.ninja ## Run the decomp gate that needs no disc.
 	meson compile -C $(GAME_BUILD) -j $(JOBS) pre-push
 
-doctor:
+doctor: ## Report the missing host tools.
 	@sh tools/doctor.sh
 
-check-tools: init-tools
+check-tools: init-tools ## Check bof3-tools.
 	$(MAKE) -C $(TOOLS) check CARGO_TARGET_DIR="$(CURDIR)/$(BUILD_DIR)/rust"
 
-check-player: init-player
+check-player: init-player ## Check the player.
 	$(MAKE) -C player check CARGO_TARGET_DIR="$(CURDIR)/$(BUILD_DIR)/audio"
 
-check-status: init-status
+check-status: init-status ## Check the status page.
 	cd $(STATUS) && npm ci && npm run check
 
 # Without an extracted disc the game gate is the disc-free one.
-check-all:
+check-all: ## Check the shared docs and every project.
 	$(MAKE) check $(if $(wildcard $(DECOMP)/build/disc/BIN),check-game,check-game-free) check-tools check-player check-status
 
-clean:
+clean: ## Remove build output; keep the disc, venv and Rust builds.
 	@sh tools/clean.sh clean
 
-distclean:
+distclean: ## Clean, then remove Meson, the venvs and the Rust build.
 	@sh tools/clean.sh distclean
