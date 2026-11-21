@@ -14,7 +14,7 @@ is a fan project, not affiliated with or endorsed by Capcom. *Breath of Fire* is
 ## Requirements
 
 The workspace needs `git` and `make`. `make check` also needs
-[dprint](https://github.com/dprint/dprint/releases/latest) and Node.js 22.23.4 or later.
+[dprint](https://github.com/dprint/dprint/releases/latest) and Node.js 24 (`wiki/.node-version`).
 On Linux x86-64, `bash tools/install/dprint.sh` installs the pinned dprint into `~/.local/bin`; put
 that folder on `PATH`.
 
