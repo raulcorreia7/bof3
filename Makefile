@@ -104,7 +104,7 @@ build-player-gui: init-player
 	@sh tools/stage.sh player-gui
 
 build-status: init-status
-	$(MAKE) -C $(STATUS) build
+	cd $(STATUS) && npm ci && npm run build
 
 # Shared documentation and configuration. Each member owns its source formatting.
 format:
@@ -133,7 +133,7 @@ check-player: init-player
 	$(MAKE) -C player check CARGO_TARGET_DIR="$(CURDIR)/$(BUILD_DIR)/audio"
 
 check-status: init-status
-	$(MAKE) -C $(STATUS) check
+	cd $(STATUS) && npm ci && npm run check
 
 # Without an extracted disc the game gate is the disc-free one.
 check-all:
