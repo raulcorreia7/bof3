@@ -13,7 +13,7 @@ esac
 # (build/disc) stay; decomp keeps its materialized payloads in build/bin.
 if [ -f decomp/build/meson/build.ninja ]; then meson compile -C decomp/build/meson --clean; fi
 rm -rf decomp/work decomp/build/report.json
-if [ -f status/Makefile ]; then make -C status clean; fi
+rm -rf status/site status/.vite
 rm -rf build/extract build/rust/tmp
 
 # Prune workspace-owned Python caches, not member repositories.
@@ -25,7 +25,7 @@ find . \( -path './.git' -o -path './.venv' -o -path './build' \
     -prune -exec rm -rf {} +
 
 if [ "$1" = distclean ]; then
-    if [ -f status/Makefile ]; then make -C status distclean; fi
+    rm -rf status/node_modules
     if [ -f decomp/tools/bof3-tools/Makefile ]; then
         CARGO_TARGET_DIR="$(pwd)/build/rust" make -C decomp/tools/bof3-tools clean
     fi
