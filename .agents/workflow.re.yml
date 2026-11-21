@@ -42,6 +42,7 @@ polish:  # when each kind of quality work happens
     - a name only with evidence (callers, data, strings); else keep func_/D_
     - one-line what-comment on each matched function
     - keep the function in the file and TU it is in
+    - the PSX SDK, PsyQ and GTE macros wherever they exist (setXY*, setRGB*, setUV*, setPolyFT4, addPrim, gte_*), never open-coded equivalents
     - a missing type, member or prototype becomes a needs line in the PR body and an attempts row
   polish_lane:  # p1, in its own PRs, merged between match rounds so lanes rebuild once
     - needs lines from merged match PRs: types, members, prototypes, structs (ASSERT_SIZE/ASSERT_OFFSET)
