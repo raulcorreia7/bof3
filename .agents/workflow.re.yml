@@ -1,0 +1,162 @@
+# The decompilation workflow as a graph: roles, steps and the edges between them.
+# A coordinator walks it; each lane is one agent working one step at a time.
+# Paths are relative to the workspace root. Facts about the game live in the wiki, not here.
+
+version: 1
+
+goal:
+  done: every game function is MATCH or HAND_ASM; `meson compile -C build/meson disc` matches every disc checksum
+  measure: decomp/build/report.json game category (matched_functions / total_functions)
+  stop:
+    - goal.done
+    - no lane merged a MATCH in its last 3 rounds (report to the owner, do not spin)
+
+roles:
+  coordinator:
+    does: start and stop lanes, refresh the queue, merge order, lessons pass
+    effort: medium
+  matcher-strong:
+    does: large or jump-table bodies, shared bodies, escalations
+    effort: medium
+    count: 1
+  matcher:
+    does: near misses, medium shapes, short undrafted functions
+    effort: high
+    count: 2
+  polisher:
+    does: header, type and struct changes from the lanes' needs lines; renames and moves from the tag allowlist
+    effort: medium
+    count: 1
+  reviewer:
+    does: the coordinator reviews by exception (see review); the gate decides the rest
+    count: 0
+
+lanes:  # split by image group so no two lanes share a file
+  m1: { role: matcher, images: [emi/world*, emi/battle] }
+  m2: { role: matcher, images: [emi/etc, emi/bmagic], except: [Menu_DrawHeaderBar] }
+  s1: { role: matcher-strong, images: [emi/scenario, exe/slus_004_22, emi/boss], also: [Menu_DrawHeaderBar, escalations] }
+  p1: { role: polisher, images: [all], owns: [include/, "*.h", config/tag_mismatches.txt] }
+
+polish:  # when each kind of quality work happens
+  at_match:  # in the match PR, by the matcher; never a header change
+    - a name only with evidence (callers, data, strings); else keep func_/D_
+    - one-line what-comment on each matched function
+    - keep the function in the file and TU it is in
+    - a missing type, member or prototype becomes a needs line in the PR body and an attempts row
+  polish_lane:  # p1, in its own PRs, merged between match rounds so lanes rebuild once
+    - needs lines from merged match PRs: types, members, prototypes, structs (ASSERT_SIZE/ASSERT_OFFSET)
+    - renames and moves from config/tag_mismatches.txt until it is empty
+    - names that newly matched code proves (rename tool, whole renames)
+    - shared bodies: one source per twin group once its members share names
+  at_100:  # once, after goal.done
+    - module TUs and headers at the proven object boundaries
+    - number formats and named sizes per site
+    - docs/subsystems.md and docs/naming.md against the tree
+
+review:  # by exception; everything else merges on the gate and CI
+  coordinator_reads:
+    - a PR that changes include/, a header, tools/, meson.build or config/ other than symbols and attempts
+    - any FAKE_ helper, register pin or Match-Removed line
+    - one match PR in ten, at random
+  blocks_on: [a MATCH not confirmed by image_check, a name without evidence, a rename that is not whole, a lost comment]
+
+rules:  # each exists because breaking it cost the project before
+  - Never read or use another decompilation of this game.
+  - One worktree per lane under .worktrees/<lane>-<mmdd>; never rm under build/; delete nothing outside it.
+  - Never amend, force-push or rebase; integrate main with git merge.
+  - Append attempts rows (tools/attempts.py add); never edit or delete one; never delete a draft.
+  - No cleanup may lose a MATCH; Match-Removed only with an owner decision.
+  - Names come from evidence; the prefix is the module the code is linked in (docs/naming.md).
+  - Commits and PR bodies follow the repo template (What, Why, Checks); no model or tool names, no Co-authored-by.
+  - Stop a process only by its PID; write logs with >| (noclobber).
+  - One bounded wait per PR; no interim status reports.
+
+commands:
+  worktree: decomp/tools/worktree.sh --from decomp --dir .worktrees/<lane>-<mmdd> match/<lane>-<mmdd>
+  queue: decomp/tools/worklist.py --lane <lane>   # ordered open functions of the lane's images
+  claim: .agents/bin/claim.sh <lane> <target>@0x<ADDR>   # exit 1: another lane holds it
+  measure: decomp/tools/match.sh <target>@0x<ADDR> --diff
+  near_miss: decomp/tools/near_miss.sh <target>@0x<ADDR> <src.c> 300
+  gate: meson compile -C build/meson pre-push >| build/gate.log 2>&1   # ends "pre-push: all checks passed"
+  image_check: BOF3_CC_CACHE=0 meson compile -C build/meson check-<image>
+  report: meson compile -C build/meson report
+
+steps:
+  refresh:
+    by: coordinator
+    run: [merge main in every lane worktree, report, queue per lane]
+    next: [pick]
+  pick:
+    by: lane
+    run: [queue, claim]
+    next:
+      claimed: classify
+      held: pick
+      empty: idle
+  classify:
+    by: lane
+    run: [measure]
+    next:  # first difference decides the tactic; see tactics
+      nocompile: repair
+      unit-order: size-first-draft
+      stub: lift
+      sched: near-miss
+      regalloc: near-miss
+      frame: near-miss
+      shape: shape
+      match: verify
+  repair: { run: rebuild the draft on the current headers, next: classify }
+  size-first-draft: { run: match the earliest wrong-sized draft in the same object first, next: classify }
+  lift: { run: [seed.py, m2c draft, lift block by block, opcode_diff.py top-down], next: classify }
+  near-miss: { run: [tactics, near_miss], next: { better: classify, stuck: park } }
+  shape: { run: [opcode_diff.py top-down, tactics by hunk label, rewrite from asm if over 15% off], next: { better: classify, stuck: park } }
+  verify:
+    run: [image_check]
+    next: { pass: batch, fail: classify }
+  park:
+    run: keep the closest NON_MATCHING draft and add one attempts row with the cause
+    when: 3 structurally different tries leave it no closer, or 8 attempts rows this session
+    next:
+      escalate: handoff
+      else: pick
+  handoff:
+    to: s1
+    when: 6 or more rows and within 10% of retail, a jump-table body, or "cause unknown" after the dumps
+    next: pick
+  batch:
+    when: 3 to 6 matches, or one batch of drafts
+    run: [merge main, format, commit, gate, push, PR with auto-merge]
+    next: { merged: pick, failed: fix }
+  fix: { run: read build/pre-push/<check>.log, fix, gate again, next: batch }
+  idle: { by: coordinator, run: rebalance lanes or stop, next: [refresh] }
+  polish-round:
+    by: p1
+    when: between match rounds (after each lane's merged batch)
+    run: [collect needs lines, one polish PR under 2000 lines, gate, auto-merge]
+    next: [refresh]
+  lessons:
+    by: coordinator
+    when: every 25 merged match PRs
+    run: [report and publish to the status site, disc check, write closed tactics into docs/matching.md, tool gaps into the tools queue]
+    next: [refresh]
+
+order:  # highest expected matches per token first
+  - promote: match.sh already says match; verify with image_check
+  - shared bodies: one body per twin group (Menu_DrawHeaderBar first), then check every image
+  - unblock: wrong-sized first drafts per object, broken drafts, callees with many open callers
+  - near misses: sched, regalloc, frame
+  - medium shapes
+  - undrafted and stub drafts
+  - hard far drafts, largest twin family first
+
+tactics:  # first difference -> tries in order; stop at a match
+  nocompile: read the error; rebuild the draft on the current header
+  unit-order: size the first draft in the object, then measure the rest
+  stub: seed, m2c, lift from the asm in blocks, gen_body.py if branch-free
+  frame: count saved s registers; a callee buffer u8 scratch[N]; local count and widths; rtl_dump.sh last
+  shape: missing load -> struct member or LOW; extra lui -> pointer local p = &G; branch -> switch, do-while or goto; constant -> u8 local or width cast
+  sched: statement order (try_variants.py), LOW() scalar load, chained assignment, member vs raw global, counter into its branch, then the permuter
+  regalloc: alloc_priority.py on the swapped values; move a last use; one local per value; declaration order; then the permuter
+  branch: do-while vs for; inverted if/else; switch over a beq chain; cross-jumped arms
+  const: p = &GLOBAL; one record's member instead of symbols; lui+ori literal vs lui+addiu symbol
+  type: a needs line, never a cast

@@ -48,6 +48,7 @@ Initialize a member before you open its paths.
   [`bof3player`](player/docs/player.md). Every tool takes `--help`.
 - Docs: [decomp/docs/README.md](decomp/docs/README.md) lists the decomp pages; each member's
   `README.md` and `docs/` hold the rest.
+- Workflow: [.agents/workflow.re.yml](.agents/workflow.re.yml) is the decompilation workflow as a graph: lanes, steps, tactics, polish, review and stop rules.
 - CI: `.github/workflows/docs.yml` here; each member has its own.
 - Wiki: edit in [wiki/](wiki/AGENTS.md); read the [site](https://raulcorreia7.github.io/bof3-wiki/).
   For a model: [llms.txt](https://raulcorreia7.github.io/bof3-wiki/llms.txt) (index),
