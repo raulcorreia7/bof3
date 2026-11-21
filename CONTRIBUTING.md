@@ -7,11 +7,9 @@ problem privately ([SECURITY.md](SECURITY.md)).
 ## Choose the repository
 
 Each project is a submodule that owns its source, documentation and checks. This workspace owns the
-`make` entry points and the pins.
-
-The README [goal router](README.md#choose-a-goal) says which project owns a change and how to
-initialize it. Each project's `CONTRIBUTING.md` says how to contribute to it; this page covers the
-workspace.
+`make` entry points and the pins. The README [goal router](README.md#choose-a-goal) says which
+project owns a change. Each project's `CONTRIBUTING.md` says how to contribute to it; this page
+covers the workspace.
 
 ## Make a change
 
@@ -30,9 +28,9 @@ workspace.
 ## Gate
 
 A workspace change runs `make check`; a member change runs that member's gate, named in the project
-guide the [goal router](README.md#choose-a-goal) links.
-
-`make format` formats shared Markdown, JSON and TOML; `make format CHECK=1` verifies it.
+guide the [goal router](README.md#choose-a-goal) links. `make format` formats the shared Markdown,
+JSON and TOML; `make format CHECK=1` verifies it. Both use the pinned dprint that
+`tools/install/dprint.sh` installs.
 
 ## What never lands
 
@@ -62,10 +60,6 @@ git commit -m "chore(submodules): update player"
    [README](https://github.com/raulcorreia7/bof3-decomp#readme) and
    [CONTRIBUTING](https://github.com/raulcorreia7/bof3-decomp/blob/main/CONTRIBUTING.md) show how.
 
-## Shared tool installer
-
-`tools/install/dprint.sh` installs the pinned dprint that `make check` and `make format` use.
-
 ## License
 
 The workspace is MIT licensed; bof3-decomp is CC0 1.0. A contribution is under the license of the
@@ -73,6 +67,6 @@ repository you change.
 
 ## Agent guidance
 
-[AGENTS.md](AGENTS.md) and the `.agents/skills` folders are optional guidance for coding agents.
-You do not need them to contribute. In them, "maintainer" is the repository owner, who reviews and
-merges pull requests; "owner" is the project that owns a change.
+[AGENTS.md](AGENTS.md) and the `.agents/skills` folders guide coding agents; you do not need them
+to contribute. In them, "maintainer" is the repository owner, who reviews and merges pull requests;
+"owner" is the project that owns a change.
