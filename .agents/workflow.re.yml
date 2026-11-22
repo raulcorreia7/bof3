@@ -40,6 +40,7 @@ quality:  # what "as the original" means; at match time and in the quality lanes
   rules:
     - SDK first: the PsyQ macros and types wherever they exist (getTPage, setRGB*, setXY*, setUV*, setWH, setPolyFT4, addPrim, setRECT, setVector, gte_*, SVECTOR, RECT); open-coded only where the bytes differ, with a note
     - structs, not offsets: a member, an array element or a typed global; no FIELD(), MEM() or cast with + 0xNN
+    - records, not scalars: locals that walk one record are a typed pointer; a word shifted apart is a struct of bytes or bit-fields
     - typed strides: the array or pointer has its element type; `i * sizeof(Type)` only where byte math must stay; never a literal size
     - a FAKE_ helper is first a wrong type: try the SDK type and the plain widths before keeping a pin (u16 tpage replaced a FAKE_REG)
     - organic names: what the thing is to the game or the SDK; never tmp10, var_s0, new_var, value2, a constant named by its value, or a name that records how the code matched
@@ -130,7 +131,17 @@ steps:
   shape: { run: [opcode_diff.py top-down, tactics by hunk label], next: { better: classify, stuck: park } }
   verify:
     run: [image_check, a jump-table function in its own unit with its .rodata row, coddog match for twins]
-    next: { pass: batch, fail: classify }
+    next: { pass: polish, fail: classify }
+  polish:  # the match is the safety net: each change is kept only while match.sh still says match
+    by: the lane that matched it, in the same PR
+    run:
+      - records for scalars: a run of locals that walk one record becomes a typed pointer or struct; a word read and shifted by 8/16/24 is a struct of bytes or bit-fields; base + 0xNN is a member; i * N is an index
+      - the SDK macro and type for each primitive, vector and page word
+      - each local, constant and case label named for what it is; one meaning per name
+      - each FAKE_ helper retried with the plain typed forms
+      - the function's name and one-line comment from what the polished body shows
+    stop: 3 tries per item; what must stay raw keeps a one-line note with the cause
+    next: batch
   park:
     run: keep the closest NON_MATCHING draft and add one attempts row with the cause
     when: 3 structurally different tries leave it no closer
