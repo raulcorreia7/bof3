@@ -11,18 +11,22 @@ goal:
     - goal.done
     - no lane merged a MATCH in its last 3 rounds (report to the owner, do not spin)
 
-roles:
+roles:  # routed by the class of each open function (worklist cause, wrong-body scan)
   coordinator:
     does: start and stop lanes, refresh the queue, merge order, lessons pass
     effort: medium
   matcher-strong:
-    does: large or jump-table bodies, shared bodies, escalations
+    does: wrong-body and far-off drafts rewritten from the asm, jump-table and large bodies, escalations
     effort: medium
     count: 1
-  matcher:
-    does: near misses, medium shapes, short undrafted functions
+  matcher-fresh:
+    does: stub and undrafted functions, written from the asm; cheapest class first
     effort: high
-    count: 2
+    count: 1
+  matcher-twin:
+    does: twin groups and the hardest near misses (one match frees every copy); names the compiler pass first
+    effort: medium
+    count: 1
   polisher:
     does: header, type and struct changes from the lanes' needs lines; renames and moves from the tag allowlist
     effort: medium
@@ -31,11 +35,12 @@ roles:
     does: the coordinator reviews by exception (see review); the gate decides the rest
     count: 0
 
-lanes:  # split by image group so no two lanes share a file
-  m1: { role: matcher, images: [emi/world*, emi/battle] }
-  m2: { role: matcher, images: [emi/etc, emi/bmagic], except: [Menu_DrawHeaderBar] }
-  s1: { role: matcher-strong, images: [emi/scenario, exe/slus_004_22, emi/boss], also: [Menu_DrawHeaderBar, escalations] }
+lanes:  # split by image group or row class so no two lanes share a file
+  s1: { role: matcher-strong, images: [emi/scenario, emi/boss], rows: [WRONG-BODY, STUB, SUSPECT, tries <= 4] }
+  f1: { role: matcher-fresh, images: [all but emi/scenario, emi/boss], rows: [cause stub, undrafted], except: [twin] }
+  t1: { role: matcher-twin, rows: [kind twin] }
   p1: { role: polisher, images: [all], owns: [include/, "*.h", config/tag_mismatches.txt] }
+  stop_lane: 2 rounds with no MATCH; the permuter and naming-only lanes stay off (no yield on 11-21/22)
 
 polish:  # when each kind of quality work happens
   at_match:  # in the match PR, by the matcher; never a header change
