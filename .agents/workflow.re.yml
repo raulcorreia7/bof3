@@ -19,7 +19,8 @@ spend:  # every rule here came from a measured round; .agents/bin/yield.py is th
   worktree: one per lane, a new branch per PR (a new worktree costs a full build)
   route: by class of work, to the model with the best matches per 100k tokens in the ledger for that class
   script_first: a step with no judgment in it is a script (.agents/bin), never a model
-  off: [permuter runs (0 of 9 matched), naming-only lanes with no code reading, Sonnet on stubs and near misses (0 of 3 rounds)]
+  permuter: 10 minutes at most per run by default, on one named near miss; longer only when the owner asks (9 long runs matched nothing)
+  off: [naming-only lanes with no code reading, Sonnet on stubs and near misses (0 of 3 rounds)]
 
 roles:
   coordinator: { does: "start and stop lanes, land PRs, ledger, lessons, plan", effort: medium }
@@ -89,6 +90,7 @@ commands:
   claim: .agents/bin/claim.sh <lane> <target>@0x<ADDR>   # exit 1: another lane holds it
   measure: decomp/tools/match.sh <target>@0x<ADDR> --diff   # passes a wrong jump table: not a proof
   image_check: BOF3_CC_CACHE=0 meson compile -C build/meson check-<image>   # the only proof of a match
+  near_miss: decomp/tools/near_miss.sh <target>@0x<ADDR> <src.c> 300   # opcode diff, then a permuter run; 600 at most
   attempt: decomp/tools/attempts.py add --function <ref> --tried TEXT   # writes config/attempts/<branch>.jsonl
   gate: meson compile -C build/meson pre-push >| build/gate.log 2>&1   # ends "pre-push: all checks passed"
   land: .agents/bin/land.sh <worktree> <branch> <pr>...   # PRs one at a time
