@@ -42,6 +42,9 @@ Work only in that worktree. A new branch from `public/main` for each pull reques
    Why, Checks) and `gh pr merge --squash --auto --delete-branch`. If it turns DIRTY, merge
    `public/main`, gate again, push.
 
+A new tactics row in `docs/matching.md` stays within the table's current column widths, so `format`
+does not re-pad the table and conflict with every other lane.
+
 ## Never
 
 - Amend, force-push, rebase, or close a pull request. Integrate with `git merge public/main`.
