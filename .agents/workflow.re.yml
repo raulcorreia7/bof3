@@ -40,6 +40,8 @@ lanes:  # split by image group or row class so no two lanes share a file
 quality:  # what "as the original" means; at match time and in the quality lanes
   rules:
     - SDK first: the PsyQ macros and types wherever they exist (getTPage, setRGB*, setXY*, setUV*, setWH, setPolyFT4, addPrim, setRECT, setVector, gte_*, SVECTOR, RECT); open-coded only where the bytes differ, with a note
+    - rectangles are rectangles: a quad whose corners are x, y, x + w, y + h is setXYWH and setUVWH, a RECT is setRECT, a clut is getClut, blending is setSemiTrans; in-place adjusts (prim->y0 += 2) follow the macro; the macro's store order and its re-evaluated arguments are the first lever for a sched or reload difference in a drawing function
+    - no steering locals: a local that only copies an argument at another width (left, top, width_u) is a wrong parameter type or a missing macro; fix that before keeping it
     - structs, not offsets: a member, an array element or a typed global; no FIELD(), MEM() or cast with + 0xNN
     - records, not scalars: locals that walk one record are a typed pointer; a word shifted apart is a struct of bytes or bit-fields
     - typed strides: the array or pointer has its element type; `i * sizeof(Type)` only where byte math must stay; never a literal size
@@ -56,6 +58,7 @@ quality:  # what "as the original" means; at match time and in the quality lanes
 
 improve:  # the loop: every round changes the workflow, not only the code
   after_each_round:
+    - read one landed match per lane against quality.rules; a draft or match that open-codes an SDK form or steers registers with copies goes back to its lane with the form to try
     - ledger: yield.py add <lane> <round> <model> <effort> <class> <matches> <calls> <ktokens>
     - route: a class whose best model matched nothing in 2 rounds goes to the next model up, or parks with its named cause
     - claims: release the claims of a stopped lane
@@ -179,6 +182,7 @@ tactics:  # first difference -> tries in order; the full table is decomp/docs/ma
   unit-order: size the first draft in the object, then measure the rest
   frame: count saved s registers; a callee buffer u8 scratch[N]; local count and widths; s16 copies of s32 arguments; rtl_dump.sh last
   shape: missing load -> struct member; extra lui -> pointer local p = &G; branch -> switch, do-while or goto; constant -> u8 local or width cast
+  prim: a run of primitive member stores -> the SDK macro with that store order (setXYWH, setUVWH, setXY4, setUV4, setRGB0, setRECT), arguments as plain expressions on the parameters
   sched: statement order (try_variants.py), a constant into a local before a global store, member vs raw global, counter into its branch
   regalloc: alloc_priority.py on the swapped values; move a last use; one local per value; declaration order; the value's SDK type
   branch: do-while vs for; inverted if/else; switch case order; each arm its own call
