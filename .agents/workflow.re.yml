@@ -28,6 +28,7 @@ roles:
   matcher-twin: { model: fable, effort: medium, does: "twin groups and the hardest near misses; names the compiler pass first" }
   quality: { model: sonnet, effort: high, does: "byte-gated sweeps with a rule: SDK macros, duplicate folds, helpers, structs for offsets" }
   namer: { model: sonnet, effort: high, does: "names and types per family from reading the code; unique bodies first" }
+  external: { does: "lanes on other harnesses and quotas (Codex, omp with a DeepSeek flash model) through herdr: near misses for the stronger, mechanical byte-gated folds for the cheaper", briefs: .agents/briefs }
   auditor: { does: "cross-checks a family's names against owner, callers and retail use; never the model that named it" }
 
 lanes:  # split by image group or row class so no two lanes share a file
@@ -65,7 +66,8 @@ improve:  # the loop: every round changes the workflow, not only the code
     - a rule broken twice after it was written: a check in pre-push with a shrink-only allowlist
     - a coordinator step done by hand twice: a script in .agents/bin
     - a check or script that never fires in a week of rounds: delete it
-  every_25_match_prs: [report and publish the status site, disc check, pins, remove landed worktrees]
+  after_each_landing: [publish (the status site follows main), remove landed worktrees]
+  every_25_match_prs: [disc check, pins]
 
 review:  # by exception; everything else merges on the gate and CI
   coordinator_reads:
@@ -99,6 +101,8 @@ commands:
   unpin: .agents/bin/unpin.py   # plain typed forms for every FAKE_REG
   primfold: .agents/bin/primfold.py   # runs of raw primitive stores into the SDK macros, where the bytes stay
   yield: .agents/bin/yield.py   # matches per 100k tokens by model and class
+  publish: .agents/bin/publish.sh <disc worktree>   # report to the status site when the matched count changed
+  lane: .agents/bin/lane.sh <herdr workspace> <name> <kind> <brief> <prompt> [-- agent args]   # a lane on another harness (.agents/briefs)
   report: meson compile -C build/meson report
 
 steps:
