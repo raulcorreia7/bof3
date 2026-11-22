@@ -44,6 +44,8 @@ quality:  # what "as the original" means; at match time and in the quality lanes
     - organic names: what the thing is to the game or the SDK; never tmp10, var_s0, new_var, value2, a constant named by its value, or a name that records how the code matched
     - owner-first prefix: the module the code is linked in; the subsystem is the first word after it (docs/naming.md)
     - one body per repeated function (src/shared), one declaration per symbol in its owner header
+    - no magic: a macro or helper says what you get in its name, takes everything it uses as an argument, has no hidden side effect, and never gives a thing a second noun (TASK(PartyMember), not BATTLE_WORK)
+    - an offset lives with its owner as a struct: the unit, else the module header; only hardware facts live in include/psx
     - one-line what-comment on every symbol; comments on game code are kept
   at_match: [a name only with evidence, else keep func_/D_, a missing type or prototype becomes a needs line, keep the function in its file and unit]
   measure: [open functions, func_ definitions, D_ globals, unk_ members, FAKE_ uses, FIELD/MEM/cast sites, literal strides, mechanical locals]
