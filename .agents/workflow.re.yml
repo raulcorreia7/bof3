@@ -94,6 +94,7 @@ commands:
   land: .agents/bin/land.sh <worktree> <branch> <pr>...   # PRs one at a time
   rename_merge: .agents/bin/rename-merge.py   # merge main into a rename branch: main's bodies, the branch's names
   unpin: .agents/bin/unpin.py   # plain typed forms for every FAKE_REG
+  primfold: .agents/bin/primfold.py   # runs of raw primitive stores into the SDK macros, where the bytes stay
   yield: .agents/bin/yield.py   # matches per 100k tokens by model and class
   report: meson compile -C build/meson report
 
