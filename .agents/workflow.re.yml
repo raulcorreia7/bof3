@@ -1,111 +1,118 @@
-# The decompilation workflow as a graph: roles, steps and the edges between them.
+# The decompilation workflow as a graph: goal, spend, lanes, quality, steps and the loop that improves it.
 # A coordinator walks it; each lane is one agent working one step at a time.
 # Paths are relative to the workspace root. Facts about the game live in the wiki, not here.
 
-version: 1
+version: 2
 
 goal:
-  done: every game function is MATCH or HAND_ASM; `meson compile -C build/meson disc` matches every disc checksum
-  measure: decomp/build/report.json game category (matched_functions / total_functions)
+  match: every game function is MATCH or HAND_ASM; `meson compile -C build/meson disc` matches every disc checksum
+  source: the C reads as its 1997 authors wrote it (see quality); no func_, D_, unk_ or mechanical name left where evidence gives one
+  measure: decomp/build/report.json game category (matched_functions / total_functions); the counts in quality.measure
   stop:
-    - goal.done
+    - goal met
     - no lane merged a MATCH in its last 3 rounds (report to the owner, do not spin)
 
-roles:  # routed by the class of each open function (worklist cause, wrong-body scan)
-  coordinator:
-    does: start and stop lanes, refresh the queue, merge order, lessons pass
-    effort: medium
-  matcher-strong:
-    does: wrong-body and far-off drafts rewritten from the asm, jump-table and large bodies, escalations
-    effort: medium
-    count: 1
-  matcher-fresh:
-    does: stub and undrafted functions, written from the asm; cheapest class first
-    effort: high
-    count: 1
-  matcher-twin:
-    does: twin groups and the hardest near misses (one match frees every copy); names the compiler pass first
-    effort: medium
-    count: 1
-  polisher:
-    does: header, type and struct changes from the lanes' needs lines; renames and moves from the tag allowlist
-    effort: medium
-    count: 1
-  reviewer:
-    does: the coordinator reviews by exception (see review); the gate decides the rest
-    count: 0
+spend:  # every rule here came from a measured round; .agents/bin/yield.py is the table
+  agents: at most 4 at once (2-3 matching, 1-2 quality); the coordinator lands PRs with scripts, not agents
+  round: a fresh agent per round (a resumed one pays for its history); budget about 200 tool calls
+  stop_lane: 2 rounds with no MATCH, or 60 calls with none inside a round
+  worktree: one per lane, a new branch per PR (a new worktree costs a full build)
+  route: by class of work, to the model with the best matches per 100k tokens in the ledger for that class
+  script_first: a step with no judgment in it is a script (.agents/bin), never a model
+  off: [permuter runs (0 of 9 matched), naming-only lanes with no code reading, Sonnet on stubs and near misses (0 of 3 rounds)]
+
+roles:
+  coordinator: { does: "start and stop lanes, land PRs, ledger, lessons, plan", effort: medium }
+  matcher-strong: { model: opus, effort: medium, does: "wrong-body and far-off drafts rewritten from the asm, jump tables, scenario, stubs" }
+  matcher-twin: { model: fable, effort: medium, does: "twin groups and the hardest near misses; names the compiler pass first" }
+  quality: { model: sonnet, effort: high, does: "byte-gated sweeps with a rule: SDK macros, duplicate folds, helpers, structs for offsets" }
+  namer: { model: sonnet, effort: high, does: "names and types per family from reading the code; unique bodies first" }
+  auditor: { does: "cross-checks a family's names against owner, callers and retail use; never the model that named it" }
 
 lanes:  # split by image group or row class so no two lanes share a file
-  s1: { role: matcher-strong, images: [emi/scenario, emi/boss], rows: [WRONG-BODY, STUB, SUSPECT, tries <= 4] }
-  f1: { role: matcher-fresh, images: [all but emi/scenario, emi/boss], rows: [cause stub, undrafted], except: [twin] }
+  s1: { role: matcher-strong, rows: [drafts with a matched twin, WRONG-BODY, STUB, SUSPECT, stub and undrafted], images: "emi/scenario and emi/boss first" }
   t1: { role: matcher-twin, rows: [kind twin] }
-  p1: { role: polisher, images: [all], owns: [include/, "*.h", config/tag_mismatches.txt] }
-  stop_lane: 2 rounds with no MATCH; the permuter and naming-only lanes stay off (no yield on 11-21/22)
+  q1: { role: quality, rows: one family of work per round, owns: [include/, "*.h"] }
+  n1: { role: namer, starts: after the duplicate folds of its family }
 
-polish:  # when each kind of quality work happens
-  at_match:  # in the match PR, by the matcher; never a header change
-    - a name only with evidence (callers, data, strings); else keep func_/D_
-    - one-line what-comment on each matched function
-    - keep the function in the file and TU it is in
-    - the PSX SDK, PsyQ and GTE macros wherever they exist (setXY*, setRGB*, setUV*, setPolyFT4, addPrim, gte_*), never open-coded equivalents
-    - a missing type, member or prototype becomes a needs line in the PR body and an attempts row
-  polish_lane:  # p1, in its own PRs, merged between match rounds so lanes rebuild once
-    - needs lines from merged match PRs: types, members, prototypes, structs (ASSERT_SIZE/ASSERT_OFFSET)
-    - renames and moves from config/tag_mismatches.txt until it is empty
-    - names that newly matched code proves (rename tool, whole renames)
-    - shared bodies: one source per twin group once its members share names
-  at_100:  # once, after goal.done
-    - module TUs and headers at the proven object boundaries
-    - number formats and named sizes per site
-    - docs/subsystems.md and docs/naming.md against the tree
+quality:  # what "as the original" means; at match time and in the quality lanes
+  rules:
+    - SDK first: the PsyQ macros and types wherever they exist (getTPage, setRGB*, setXY*, setUV*, setWH, setPolyFT4, addPrim, setRECT, setVector, gte_*, SVECTOR, RECT); open-coded only where the bytes differ, with a note
+    - structs, not offsets: a member, an array element or a typed global; no FIELD(), MEM() or cast with + 0xNN
+    - typed strides: the array or pointer has its element type; `i * sizeof(Type)` only where byte math must stay; never a literal size
+    - a FAKE_ helper is first a wrong type: try the SDK type and the plain widths before keeping a pin (u16 tpage replaced a FAKE_REG)
+    - organic names: what the thing is to the game or the SDK; never tmp10, var_s0, new_var, value2, a constant named by its value, or a name that records how the code matched
+    - owner-first prefix: the module the code is linked in; the subsystem is the first word after it (docs/naming.md)
+    - one body per repeated function (src/shared), one declaration per symbol in its owner header
+    - one-line what-comment on every symbol; comments on game code are kept
+  at_match: [a name only with evidence, else keep func_/D_, a missing type or prototype becomes a needs line, keep the function in its file and unit]
+  measure: [open functions, func_ definitions, D_ globals, unk_ members, FAKE_ uses, FIELD/MEM/cast sites, literal strides, mechanical locals]
+  at_100: [module units and headers at the proven object boundaries, docs/subsystems.md and each module's interface against the tree]
+
+improve:  # the loop: every round changes the workflow, not only the code
+  after_each_round:
+    - ledger: yield.py add <lane> <round> <model> <effort> <class> <matches> <calls> <ktokens>
+    - route: a class whose best model matched nothing in 2 rounds goes to the next model up, or parks with its named cause
+    - claims: release the claims of a stopped lane
+    - plan: update the state file (tracks, counts, next)
+  lessons:  # each finding moves one level toward the gate
+    - a tactic that closed a function: a row in docs/matching.md, in the same PR
+    - the same miss in 2 rounds: a rule in the decomp skill (references/match.md, name.md, review.md)
+    - a rule broken twice after it was written: a check in pre-push with a shrink-only allowlist
+    - a coordinator step done by hand twice: a script in .agents/bin
+    - a check or script that never fires in a week of rounds: delete it
+  every_25_match_prs: [report and publish the status site, disc check, pins, remove landed worktrees]
 
 review:  # by exception; everything else merges on the gate and CI
   coordinator_reads:
     - a PR that changes include/, a header, tools/, meson.build or config/ other than symbols and attempts
-    - any FAKE_ helper, register pin or Match-Removed line
+    - any new FAKE_ helper, register pin or Match-Removed line
     - one match PR in ten, at random
   blocks_on: [a MATCH not confirmed by image_check, a name without evidence, a rename that is not whole, a lost comment]
 
 rules:  # each exists because breaking it cost the project before
   - Never read or use another decompilation of this game.
-  - One worktree per lane under .worktrees/<lane>-<mmdd>; never rm under build/; delete nothing outside it.
+  - Never rm under build/; delete nothing outside the lane's worktree.
   - Never amend, force-push or rebase; integrate main with git merge.
-  - Append attempts rows (tools/attempts.py add); never edit or delete one; never delete a draft.
+  - Append attempts rows (tools/attempts.py add, one file per branch); never edit or delete one; never delete a draft.
   - No cleanup may lose a MATCH; Match-Removed only with an owner decision.
-  - Names come from evidence; the prefix is the module the code is linked in (docs/naming.md).
+  - Target maps (splat rows other than a jump table's own .rodata row, symbol boundaries) and compiler config change only with an owner decision.
   - Commits and PR bodies follow the repo template (What, Why, Checks); no model or tool names, no Co-authored-by.
   - Stop a process only by its PID; write logs with >| (noclobber).
-  - One bounded wait per PR; no interim status reports.
+  - Push every gated commit at once; one bounded wait per PR; no interim status reports.
 
 commands:
-  worktree: decomp/tools/worktree.sh --from decomp --dir .worktrees/<lane>-<mmdd> match/<lane>-<mmdd>
-  queue: decomp/tools/worklist.py --lane <lane>   # ordered open functions of the lane's images
+  worktree: decomp/tools/worktree.sh --from decomp --dir .worktrees/<lane> match/<lane>-<mmdd>
+  queue: decomp/tools/worklist.py --image <glob>... --order strategy --measure   # open functions with their cause
   claim: .agents/bin/claim.sh <lane> <target>@0x<ADDR>   # exit 1: another lane holds it
-  measure: decomp/tools/match.sh <target>@0x<ADDR> --diff
-  near_miss: decomp/tools/near_miss.sh <target>@0x<ADDR> <src.c> 300
+  measure: decomp/tools/match.sh <target>@0x<ADDR> --diff   # passes a wrong jump table: not a proof
+  image_check: BOF3_CC_CACHE=0 meson compile -C build/meson check-<image>   # the only proof of a match
+  attempt: decomp/tools/attempts.py add --function <ref> --tried TEXT   # writes config/attempts/<branch>.jsonl
   gate: meson compile -C build/meson pre-push >| build/gate.log 2>&1   # ends "pre-push: all checks passed"
-  image_check: BOF3_CC_CACHE=0 meson compile -C build/meson check-<image>
+  land: .agents/bin/land.sh <worktree> <branch> <pr>...   # PRs one at a time
+  rename_merge: .agents/bin/rename-merge.py   # merge main into a rename branch: main's bodies, the branch's names
+  unpin: .agents/bin/unpin.py   # plain typed forms for every FAKE_REG
+  yield: .agents/bin/yield.py   # matches per 100k tokens by model and class
   report: meson compile -C build/meson report
 
 steps:
   refresh:
     by: coordinator
-    run: [merge main in every lane worktree, report, queue per lane]
+    run: [land open PRs, report, queue, yield, pick the lanes for the next round]
     next: [pick]
   pick:
     by: lane
     run: [queue, claim]
-    next:
-      claimed: classify
-      held: pick
-      empty: idle
+    next: { claimed: check-body, held: pick, empty: idle }
+  check-body:  # before any tuning
+    run: compare the draft's size, callees, globals and constants with the target asm
+    next: { same function: classify, another function or a stub: lift }
   classify:
     by: lane
     run: [measure]
-    next:  # first difference decides the tactic; see tactics
+    next:  # the first difference decides the tactic; see tactics
       nocompile: repair
       unit-order: size-first-draft
-      stub: lift
       sched: near-miss
       regalloc: near-miss
       frame: near-miss
@@ -113,56 +120,46 @@ steps:
       match: verify
   repair: { run: rebuild the draft on the current headers, next: classify }
   size-first-draft: { run: match the earliest wrong-sized draft in the same object first, next: classify }
-  lift: { run: [seed.py, m2c draft, lift block by block, opcode_diff.py top-down], next: classify }
-  near-miss: { run: [tactics, near_miss], next: { better: classify, stuck: park } }
-  shape: { run: [opcode_diff.py top-down, tactics by hunk label, rewrite from asm if over 15% off], next: { better: classify, stuck: park } }
+  lift: { run: [seed.py, read asm.s and hints.md, write the body from the asm with quality.rules], next: classify }
+  near-miss: { run: [name the compiler pass (rtl_dump.sh, alloc_priority.py), tactics], next: { better: classify, stuck: park } }
+  shape: { run: [opcode_diff.py top-down, tactics by hunk label], next: { better: classify, stuck: park } }
   verify:
-    run: [image_check]
+    run: [image_check, a jump-table function in its own unit with its .rodata row, coddog match for twins]
     next: { pass: batch, fail: classify }
   park:
     run: keep the closest NON_MATCHING draft and add one attempts row with the cause
-    when: 3 structurally different tries leave it no closer, or 8 attempts rows this session
-    next:
-      escalate: handoff
-      else: pick
-  handoff:
-    to: s1
-    when: 6 or more rows and within 10% of retail, a jump-table body, or "cause unknown" after the dumps
-    next: pick
+    when: 3 structurally different tries leave it no closer
+    next: { twin or within 10% of retail: handoff, else: pick }
+  handoff: { to: t1, next: pick }
   batch:
     when: 3 to 6 matches, or one batch of drafts
-    run: [merge main, format, commit, gate, push, PR with auto-merge]
+    run: [merge main, format, commit, gate, push, PR with auto-merge, new tactics into docs/matching.md]
     next: { merged: pick, failed: fix }
   fix: { run: read build/pre-push/<check>.log, fix, gate again, next: batch }
-  idle: { by: coordinator, run: rebalance lanes or stop, next: [refresh] }
-  polish-round:
-    by: p1
-    when: between match rounds (after each lane's merged batch)
-    run: [collect needs lines, one polish PR under 2000 lines, gate, auto-merge]
+  idle: { by: coordinator, run: improve.after_each_round, next: [refresh] }
+  quality-round:
+    by: q1
+    run: [count sites first, convert per site, image_check, revert a site whose bytes change and list its cause, one PR per family under 2000 lines, net lines not up]
     next: [refresh]
-  lessons:
-    by: coordinator
-    when: every 25 merged match PRs
-    run: [report and publish to the status site, disc check, write closed tactics into docs/matching.md, tool gaps into the tools queue]
+  name-round:
+    by: n1
+    run: [one family, unique bodies first, evidence per name, symbol.py rename to every copy, audit by another model]
     next: [refresh]
 
-order:  # highest expected matches per token first
-  - promote: match.sh already says match; verify with image_check
-  - shared bodies: one body per twin group (Menu_DrawHeaderBar first), then check every image
-  - unblock: wrong-sized first drafts per object, broken drafts, callees with many open callers
-  - near misses: sched, regalloc, frame
-  - medium shapes
-  - undrafted and stub drafts
-  - hard far drafts, largest twin family first
+order:  # highest measured matches per token first
+  - drafts whose twin already matches
+  - wrong-body and stub drafts, written from the asm
+  - twin groups (one match frees every copy)
+  - unblock: wrong-sized first drafts per object, callees with many open callers
+  - near misses by cause: frame, then shape, sched, regalloc
+  - parked rows, with the tactics found since
 
-tactics:  # first difference -> tries in order; stop at a match
+tactics:  # first difference -> tries in order; the full table is decomp/docs/matching.md
   nocompile: read the error; rebuild the draft on the current header
   unit-order: size the first draft in the object, then measure the rest
-  stub: seed, m2c, lift from the asm in blocks, gen_body.py if branch-free
-  frame: count saved s registers; a callee buffer u8 scratch[N]; local count and widths; rtl_dump.sh last
-  shape: missing load -> struct member or LOW; extra lui -> pointer local p = &G; branch -> switch, do-while or goto; constant -> u8 local or width cast
-  sched: statement order (try_variants.py), LOW() scalar load, chained assignment, member vs raw global, counter into its branch, then the permuter
-  regalloc: alloc_priority.py on the swapped values; move a last use; one local per value; declaration order; then the permuter
-  branch: do-while vs for; inverted if/else; switch over a beq chain; cross-jumped arms
-  const: p = &GLOBAL; one record's member instead of symbols; lui+ori literal vs lui+addiu symbol
-  type: a needs line, never a cast
+  frame: count saved s registers; a callee buffer u8 scratch[N]; local count and widths; s16 copies of s32 arguments; rtl_dump.sh last
+  shape: missing load -> struct member; extra lui -> pointer local p = &G; branch -> switch, do-while or goto; constant -> u8 local or width cast
+  sched: statement order (try_variants.py), a constant into a local before a global store, member vs raw global, counter into its branch
+  regalloc: alloc_priority.py on the swapped values; move a last use; one local per value; declaration order; the value's SDK type
+  branch: do-while vs for; inverted if/else; switch case order; each arm its own call
+  type: the SDK type first; else a needs line, never a cast
