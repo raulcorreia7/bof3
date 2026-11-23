@@ -44,6 +44,11 @@ metrics are `addr`, `names`, `casts`, `harmful`, `notes`, `pasted`, `twins`.
 - Callers and callees: `tools/seed.py <ref>` writes `work/<image>/<ADDR>/` with `asm.s`, the callers,
   the callees and the nearest bodies. An address without a name: `tools/symbol.py at <target> 0x<ADDR>`;
   a member: `tools/symbol.py member <Type> 0x<OFF>`; a bare value: `tools/symbol.py value 0x<NN>`.
+- Duplicates: `tools/dups.py near` for alike opcodes and the matched template, `shared-names` for one
+  name in several places, `split-names` for byte-equal bodies with several names; `tools/template_try.py`
+  when a template may fold the body into `src/shared` or the group's `shared/` header.
+- Arguments: the asm and every call site fix each parameter's width, sign and name; no `argN`, no
+  parameter named by its value.
 - Retail check: `tools/match.sh <ref>` after every edit (exit 0 is a match), `--diff` for the
   side-by-side. The asm is the authority on width, sign and order: read `asm.s` before writing a
   type, a cast or a comparison.
@@ -58,7 +63,8 @@ metrics are `addr`, `names`, `casts`, `harmful`, `notes`, `pasted`, `twins`.
    only where byte math must stay).
 2. SDK first: the PsyQ macros and types (`getTPage`, `setRGB*`, `setXY*`, `setUV*`, `setWH`,
    `setPolyFT4`, `addPrim`, `setRECT`, `setVector`, `gte_*`, `SVECTOR`, `RECT`) wherever they give
-   the same bytes; open-coded only where the bytes differ, with a one-line note.
+   the same bytes, and the PsyQ routine whose prototype in `include/psyq/` and call shape say the
+   same thing; open-coded only where the bytes differ, with a one-line note.
 3. Names: what the thing is to the game or the SDK, owner-first prefix, no mechanical locals
    (`tmp*`, `var_*`, `new_var`, `arg<N>`), no constant named by its value, no name that records how
    it matched. A `case` label gets the enum member its users give it.
