@@ -13,7 +13,7 @@ goal:
     - no lane merged a MATCH in its last 3 rounds (report to the owner, do not spin)
 
 spend:  # every rule here came from a measured round; .agents/bin/yield.py is the table
-  agents: at most 4 at once (2-3 matching, 1-2 quality); the coordinator lands PRs with scripts, not agents
+  agents: one match lane per image group plus one systemic lane (5 at once); the coordinator lands PRs with scripts, not agents
   round: a fresh agent per round (a resumed one pays for its history); budget about 200 tool calls
   stop_lane: 2 rounds with no MATCH, or 60 calls with none inside a round
   worktree: one per lane, a new branch per PR (a new worktree costs a full build)
@@ -32,8 +32,11 @@ roles:
   auditor: { does: "cross-checks a family's names against owner, callers and retail use; never the model that named it" }
 
 lanes:  # split by image group or row class so no two lanes share a file
-  s1: { role: matcher-strong, rows: [drafts with a matched twin, WRONG-BODY, STUB, SUSPECT, stub and undrafted], images: "emi/scenario and emi/boss first" }
-  t1: { role: matcher-twin, rows: [kind twin] }
+  c-etc: { role: matcher-strong, images: "emi/etc" }
+  c-scn: { role: matcher-strong, images: "emi/scenario, emi/boss, exe" }
+  c-btl: { role: matcher-strong, images: "emi/battle, emi/bmagic" }
+  c-world: { role: quality, images: "emi/world00 to emi/world04", rows: near misses }
+  c-sys: { role: quality, rows: "causes shared by many rows, by script: volatile globals, scalar or member spelling of one address", owns: [the two shared-header changes in rules] }
   q1: { role: quality, rows: one family of work per round, owns: [include/, "*.h"] }
   n1: { role: namer, starts: after the duplicate folds of its family }
 
@@ -85,6 +88,7 @@ rules:  # each exists because breaking it cost the project before
   - Never amend, force-push or rebase; integrate main with git merge.
   - Append attempts rows (tools/attempts.py add, one file per branch); never edit or delete one; never delete a draft.
   - No cleanup may lose a MATCH; Match-Removed only with an owner decision.
+  - A shared header changes in a match lane only for a global's volatile qualifier or the scalar or member spelling of one address, in its own PR with the full gate.
   - Target maps (splat rows other than a jump table's own .rodata row, symbol boundaries) and compiler config change only with an owner decision.
   - Commits and PR bodies follow the repo template (What, Why, Checks); no model or tool names, no Co-authored-by.
   - Stop a process only by its PID; write logs with >| (noclobber).
@@ -169,7 +173,8 @@ steps:
     run: [one family, unique bodies first, evidence per name, symbol.py rename to every copy, audit by another model]
     next: [refresh]
 
-order:  # highest measured matches per token first
+order:  # highest measured matches per token first; inside a class, fewest differing instructions first
+  - a cause shared by many rows (the blockers table, ~/.cache/bof3-swarm/blockers), by script
   - drafts whose twin already matches
   - wrong-body and stub drafts, written from the asm
   - twin groups (one match frees every copy)

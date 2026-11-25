@@ -20,7 +20,9 @@ Work only in that worktree. A new branch from `public/main` for each pull reques
 ## Loop
 
 1. Queue: `python3 tools/worklist.py --image <your images> --order strategy -n 400 --measure`; take
-   your rows (the prompt names the cause or class), smallest first. Skip a row that already matches.
+   your rows (the prompt names the cause or class), fewest differing instructions first. Skip a row
+   that already matches. The newest `~/.cache/bof3-swarm/blockers/coverage*.tsv` has one line per
+   open function with its cause and the first-hunk fix: measure again, then try that fix first.
 2. Claim: `~/projects/bof3/.agents/bin/claim.sh <lane> <target>@0x<ADDR>`; exit 1 means another lane
    has it: take the next row.
 3. Check the body: is the draft this function? Compare size, callees, globals and constants with
@@ -52,6 +54,9 @@ does not re-pad the table and conflict with every other lane.
 - Edit or delete an attempts row or a draft. Turn a MATCH function back into a draft.
 - Change a target map, `splat.yaml` (other than a jump table's own `.rodata` row), compiler flags,
   or a file under `include/` that other images share: write a `needs:` line in the pull request.
+  Two shared-header changes are allowed, each in its own small pull request with the functions it
+  matches and the full gate: a global's `volatile` qualifier, and one address spelled as a scalar
+  or as a member the way retail addresses it. Change only that symbol's lines.
 - Put a model or tool name, or `Co-authored-by`, in a commit or pull request.
 - Stop a process other than by its PID. Write logs with `>|` (the shell is zsh with noclobber).
 
