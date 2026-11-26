@@ -13,9 +13,11 @@ goal:
     - no lane merged a MATCH in its last 3 rounds (report to the owner, do not spin)
 
 spend:  # every rule here came from a measured round; .agents/bin/yield.py is the table
-  agents: one match lane per image group plus one systemic lane (5 at once); the coordinator lands PRs with scripts, not agents
+  agents: at most 4 at once, all on matching until the queue is empty; naming and quality lanes start only when the owner asks; the coordinator lands PRs with scripts, not agents
   round: a fresh agent per round (a resumed one pays for its history); budget about 200 tool calls
-  stop_lane: 2 rounds with no MATCH, or 60 calls with none inside a round
+  stop_lane: 2 rounds with no MATCH, or 60 consecutive calls with none after 8 rows tried
+  per_row: about 12 calls for a medium row, 25 for a hard one; then an attempts row and the next row
+  no_watchers: gates run in the foreground; a lane leaves no wait loop or monitor behind
   worktree: one per lane, a new branch per PR (a new worktree costs a full build)
   route: by class of work, to the model with the best matches per 100k tokens in the ledger for that class
   script_first: a step with no judgment in it is a script (.agents/bin), never a model
@@ -31,14 +33,11 @@ roles:
   external: { does: "lanes on other harnesses and quotas (Codex, omp with a DeepSeek flash model) through herdr: near misses for the stronger, mechanical byte-gated folds for the cheaper", briefs: .agents/briefs }
   auditor: { does: "cross-checks a family's names against owner, callers and retail use; never the model that named it" }
 
-lanes:  # split by image group or row class so no two lanes share a file
-  c-etc: { role: matcher-strong, images: "emi/etc" }
-  c-scn: { role: matcher-strong, images: "emi/scenario, emi/boss, exe" }
-  c-btl: { role: matcher-strong, images: "emi/battle, emi/bmagic" }
-  c-world: { role: quality, images: "emi/world00 to emi/world04", rows: near misses }
-  c-sys: { role: quality, rows: "causes shared by many rows, by script: volatile globals, scalar or member spelling of one address", owns: [the two shared-header changes in rules] }
-  q1: { role: quality, rows: one family of work per round, owns: [include/, "*.h"] }
-  n1: { role: namer, starts: after the duplicate folds of its family }
+lanes:  # by cause first, then by image group; no two lanes share a file
+  cause: { role: matcher-strong, rows: "one shared cause across images, from a scan of every open row (base register or absolute address, a wrong body, a short draft)" }
+  area: { role: matcher-strong, images: "emi/world00 to emi/world04" }
+  etc: { role: matcher-strong, images: "emi/etc" }
+  battle: { role: matcher-strong, images: "emi/battle, emi/bmagic, emi/scenario, emi/boss, exe" }
 
 quality:  # what "as the original" means; at match time and in the quality lanes
   rules:
@@ -89,6 +88,10 @@ rules:  # each exists because breaking it cost the project before
   - Append attempts rows (tools/attempts.py add, one file per branch); never edit or delete one; never delete a draft.
   - No cleanup may lose a MATCH; Match-Removed only with an owner decision.
   - A shared header changes in a match lane only for a global's volatile qualifier or the scalar or member spelling of one address, in its own PR with the full gate.
+  - A MATCH is proven by a real rebuild: touch the source file, run the uncached image check, see the compile line and OK.
+  - No Match-Removed, Kept-Removed or Quality-Allowed line without an owner decision; a check that objects means the change is wrong or stays out.
+  - A rename never edits a splat row; while engine functions are splat rows, a naming lane moves no file between folders.
+  - The decomp checkout and the root pin follow decomp main after every landing; a local edit there is saved as a patch first.
   - Target maps (splat rows other than a jump table's own .rodata row, symbol boundaries) and compiler config change only with an owner decision.
   - Commits and PR bodies follow the repo template (What, Why, Checks); no model or tool names, no Co-authored-by.
   - Stop a process only by its PID; write logs with >| (noclobber).
@@ -173,8 +176,11 @@ steps:
     run: [one family, unique bodies first, evidence per name, symbol.py rename to every copy, audit by another model]
     next: [refresh]
 
-order:  # highest measured matches per token first; inside a class, fewest differing instructions first
-  - a cause shared by many rows (the blockers table, ~/.cache/bof3-swarm/blockers), by script
+order:  # by measured matches per token (yield.py); 38 matches on 26 and 27 November
+  - a body check on every open draft: size, callees in order, switch cases; another function's body or a short draft is lifted from the assembly
+  - a cause shared by many rows, found by a scripted scan and closed with one rule (base register or absolute address: 10 matches in 5 rounds)
+  - medium rows, shape before frame, read against the assembly for content: a constant, a compare's sense or width, store order, a missing statement or argument, the return structure
+  - parked: rows that differ only by register allocation, scheduling or a delay slot (0 of about 40 tried); one 10-minute permuter run at most
   - drafts whose twin already matches
   - wrong-body and stub drafts, written from the asm
   - twin groups (one match frees every copy)
