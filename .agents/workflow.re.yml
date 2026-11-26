@@ -13,9 +13,11 @@ goal:
     - no lane merged a MATCH in its last 3 rounds (report to the owner, do not spin)
 
 spend:  # every rule here came from a measured round; .agents/bin/yield.py is the table
-  agents: at most 4 at once, all on matching until the queue is empty; naming and quality lanes start only when the owner asks; the coordinator lands PRs with scripts, not agents
-  round: a fresh agent per round (a resumed one pays for its history); budget about 200 tool calls
-  stop_lane: 2 rounds with no MATCH, or 60 consecutive calls with none after 8 rows tried
+  agents: at most 4 at once, counting every kind (match, polish, tool, design); a new owner request joins the queue or replaces the lane with the lowest yield, it never raises the count; the coordinator lands PRs with scripts, not agents
+  round: a fresh agent per round (a resumed one pays for its history); a stopped lane is resumed only to land work it left local; budget about 200 tool calls
+  study: a lane that studies one cause (a table of what the compiler does) gets one round; its output is a tactics row and an edit class in decomp/tools/sweep_edits.py, and the scripted climb applies it to every open row before any model does
+  disk: check `df -i /` before a round; a scripted sweep compiles outside the shared compiler cache (one exhausted the disk's inodes and stopped every lane)
+  stop_lane: 2 rounds with no MATCH (`yield.py trend` marks it DRY), or 60 consecutive calls with none after 8 rows tried
   per_row: about 12 calls for a medium row, 25 for a hard one; then an attempts row and the next row
   no_watchers: gates run in the foreground; a lane leaves no wait loop or monitor behind
   worktree: one per lane, a new branch per PR (a new worktree costs a full build)
@@ -61,7 +63,7 @@ quality:  # what "as the original" means; at match time and in the quality lanes
 improve:  # the loop: every round changes the workflow, not only the code
   after_each_round:
     - read one landed match per lane against quality.rules; a draft or match that open-codes an SDK form or steers registers with copies goes back to its lane with the form to try
-    - ledger: yield.py add <lane> <round> <model> <effort> <class> <matches> <calls> <ktokens>
+    - ledger: yield.py add <lane> <round> <model> <effort> <class> <matches> <calls> <ktokens>; then yield.py trend - close every lane it marks DRY, and when the day's rate falls under 0.3 matches per 100k tokens tell the owner the cost of the remaining rows before starting more rounds
     - route: a class whose best model matched nothing in 2 rounds goes to the next model up, or parks with its named cause
     - claims: release the claims of a stopped lane
     - plan: update the state file (tracks, counts, next)
@@ -70,6 +72,8 @@ improve:  # the loop: every round changes the workflow, not only the code
     - the same miss in 2 rounds: a rule in the decomp skill (references/match.md, name.md, review.md)
     - a rule broken twice after it was written: a check in pre-push with a shrink-only allowlist
     - a coordinator step done by hand twice: a script in .agents/bin
+    - a lane report that names a tool fault, a wrong brief or a blocked check: fixed before the next round starts, not carried in briefs as a warning
+    - an owner direction: one dated line in the delivery plan and the workflow rule it changes, in the same turn
     - a check or script that never fires in a week of rounds: delete it
   after_each_landing: [publish (the status site follows main), remove landed worktrees]
   every_25_match_prs: [disc check, pins]
