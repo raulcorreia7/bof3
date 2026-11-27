@@ -36,7 +36,7 @@ lane has it, so take the next row.
 ## Lift one function
 
 1. Seed: `tools/seed.py <ref>` writes `work/<image>/<ADDR>/` with `asm.s` (the retail assembly),
-   `ctx.c`, the m2c draft, twins and callees. Read `hints.md` first.
+   `ctx.c`, the m2c draft and callees. Read `hints.md` first.
 2. Read the assembly top to bottom and write the body statement for statement: member reads through
    the owner struct's type, SDK macros for hardware work, locals named by what they hold. A twin
    that already has a body is shared, not lifted again: copy the twin body and its types.
