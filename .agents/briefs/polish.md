@@ -41,12 +41,11 @@ metrics are `addr`, `names`, `casts`, `harmful`, `notes`, `pasted`, `twins`.
 
 - Every use in the tree: `rg -n '\bSYM\b' src include`; in the retail image:
   `bin/rz <target> 'aaa; axt @ SYM'`; typed users: `tools/symbol.py uses <Name>`.
-- Callers and callees: `tools/seed.py <ref>` writes `work/<image>/<ADDR>/` with `asm.s`, the callers,
-  the callees and the nearest bodies. An address without a name: `tools/symbol.py at <target> 0x<ADDR>`;
+- Callers and callees: `tools/seed.py <ref>` writes `work/<image>/<ADDR>/` with `asm.s`, the callers
+  and the callees. An address without a name: `tools/symbol.py at <target> 0x<ADDR>`;
   a member: `tools/symbol.py member <Type> 0x<OFF>`; a bare value: `tools/symbol.py value 0x<NN>`.
-- Duplicates: `tools/dups.py near` for alike opcodes and the matched template, `shared-names` for one
-  name in several places, `split-names` for byte-equal bodies with several names; `tools/template_try.py`
-  when a template may fold the body into `src/shared` or the group's `shared/` header.
+- Duplicates: `bin/coddog cluster <target>` for alike bodies, `ripwire src --clones` for repeated C bodies;
+  fold a shared body into `src/shared` or the group's `shared/` header.
 - Arguments: the asm and every call site fix each parameter's width, sign and name; no `argN`, no
   parameter named by its value.
 - Retail check: `tools/match.sh <ref>` after every edit (exit 0 is a match), `--diff` for the
