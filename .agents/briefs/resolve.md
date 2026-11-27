@@ -26,7 +26,7 @@ All your work happens in that worktree, on a detached checkout of the pull reque
    - A file one side only renamed things in: take the other side's body and apply the renames again
      (`~/projects/bof3/.agents/bin/rename-merge.py` does this for a rename branch).
    - Code that no longer compiles after the merge because `main` changed a name or a macro (for
-     example `g_Task->member` is now `TASK(PartyMember)->member` in battle and battle-magic code):
+     example `g_Self->member` is now `SELF(PartyMember)->member` in battle and battle-magic code):
      apply `main`'s form.
    - A conflict between two different bodies of the same function: keep the one that is `MATCH`;
      never keep a draft over a match. If both are drafts, keep `main`'s and say so in a comment on
