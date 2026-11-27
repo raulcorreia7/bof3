@@ -113,7 +113,7 @@ commands:
   land: .agents/bin/land.sh <worktree> <branch> <pr>...   # PRs one at a time
   rename_merge: .agents/bin/rename-merge.py   # merge main into a rename branch: main's bodies, the branch's names
   yield: .agents/bin/yield.py   # matches per 100k tokens by model and class
-  publish: .agents/bin/publish.sh <disc worktree>   # report to the status site when the matched count changed
+  publish: .agents/bin/publish.sh [disc worktree]   # report to the status site when main has moved
   lane: .agents/bin/lane.sh <herdr workspace> <name> <kind> <brief> <prompt> [-- agent args]   # a lane on another harness (.agents/briefs)
   report: meson compile -C build/meson report
 
