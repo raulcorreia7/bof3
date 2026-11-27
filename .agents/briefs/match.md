@@ -37,7 +37,7 @@ Work only in that worktree. A new branch from `public/main` for each pull reques
 6. Polish while it matches (keep a change only if `match.sh` still says match): struct members and
    typed pointers for offsets and scalar runs, SDK macros and types, names that say what the thing
    is, `FAKE_` helpers retried with plain typed forms, a one-line comment. Battle and battle-magic
-   code reads the task as `TASK(PartyMember)->member`.
+   code reads the task as `SELF(PartyMember)->member`.
 7. Batch 3 to 6 matches: `git merge public/main`, `meson compile -C build/meson format`, commit,
    then the gate: `meson compile -C build/meson pre-push >| build/gate.log 2>&1`, which must end
    `pre-push: all checks passed`. Push, open the pull request with the repository template (What,
