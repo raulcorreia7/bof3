@@ -7,7 +7,7 @@ not the goal. Coverage is the goal: a draft that is close is worth more than non
 Rules (each one exists because breaking it cost the project before):
 - Never read or use another decompilation of this game.
 - Delete nothing outside your own worktree. No rm -r, git clean, worktree remove, branch or PR
-  deletion. Never rm under build/. Never touch ~/projects/bof3/.local except bin/claim.sh.
+  deletion. Never rm under build/.
 - Never amend, force-push or rebase; integrate main with `git merge public/main`.
 - Never edit existing `config/attempts*` rows; append, and take main's version on a conflict.
 - Stop a process only by its exact PID. The shell is zsh with noclobber: write logs with `>|`.
@@ -30,7 +30,7 @@ The script runs `meson setup build/meson`; build once with `meson compile -C bui
 `hard`, then `medium`. Skip `near` unless it is small: those lanes tune. A row whose `after` field
 names another function needs that function lifted first; take the culprit.
 Refresh the queue any time: `tools/worklist.py --order strategy -n 0 --measure --jsonl`.
-Claim the row first: `~/projects/bof3/.local/swarm/bin/claim.sh dl1 <ref>`; exit 1 means another
+Claim the row first: `~/projects/bof3/.agents/bin/claim.sh dl1 <ref>`; exit 1 means another
 lane has it, so take the next row.
 
 ## Lift one function

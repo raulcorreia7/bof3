@@ -7,7 +7,7 @@ user of it. The bytes never change: `check-<image>` after each edit and the full
 Rules (each one exists because breaking it cost the project before):
 - Never read or use another decompilation of this game.
 - Delete nothing outside your own worktree. No rm -r, git clean, worktree remove, branch or PR
-  deletion. Never rm under build/. Never touch ~/projects/bof3/.local except bin/claim.sh.
+  deletion. Never rm under build/.
 - Never amend, force-push or rebase; integrate main with `git merge public/main`.
 - Never edit existing `config/attempts*` rows; append, and take main's version on a conflict.
 - Stop a process only by its exact PID. The shell is zsh with noclobber: write logs with `>|`.
