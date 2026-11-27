@@ -5,7 +5,7 @@ assembly, with every image's bytes unchanged. A lift is a `NON_MATCHING` draft; 
 not the goal. Coverage is the goal: a draft that is close is worth more than none.
 
 Rules (each one exists because breaking it cost the project before):
-- Never read or use another decompilation of this game.
+- Never read or use another decompilation of this game, with one exception the owner approved with its author's permission: kerokline's decompilation of the 2001 PC port (https://github.com/kerokline/BreathOfFire3PCPort) may be read as a guide to STRUCTURE - nesting, loops, what is one expression or two statements, the order of stores. Its `symbols.toml` pairs PC functions with PlayStation addresses. Never copy its code text, comments or identifiers; write the C from this disc's assembly in this tree's names, types and SDK macros; the byte check decides. Say in the attempts row and the PR when a structure was cross-checked against it.
 - Delete nothing outside your own worktree. No rm -r, git clean, worktree remove, branch or PR
   deletion. Never rm under build/.
 - Never amend, force-push or rebase; integrate main with `git merge public/main`.
